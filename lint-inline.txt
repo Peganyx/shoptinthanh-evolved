@@ -1,0 +1,10 @@
+
+> shoptinthanh-evolved@0.1.0 lint
+> eslint
+
+
+C:\Users\ADMIN\.openclaw\workspace\projects\shoptinthanh-evolved\src\app\layout.tsx
+  56:9  warning  Custom fonts not added in `pages/_document.js` will only load for a single page. This is discouraged. See: https://nextjs.org/docs/messages/no-page-custom-font  @next/next/no-page-custom-font
+
+✖ 1 problem (0 errors, 1 warning)
+

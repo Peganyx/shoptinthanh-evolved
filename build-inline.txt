@@ -1,0 +1,44 @@
+
+> shoptinthanh-evolved@0.1.0 build
+> next build
+
+▲ Next.js 16.2.1 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.1s
+  Running TypeScript ...
+  Finished TypeScript in 6.0s ...
+  Collecting page data using 21 workers ...
+  Generating static pages using 21 workers (0/19) ...
+  Generating static pages using 21 workers (4/19) 
+  Generating static pages using 21 workers (9/19) 
+  Generating static pages using 21 workers (14/19) 
+✓ Generating static pages using 21 workers (19/19) in 1127ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /api/categories
+├ ƒ /api/checkout
+├ ƒ /api/health
+├ ƒ /api/orders
+├ ƒ /api/products
+├ ƒ /api/products/[slug]
+├ ○ /blog
+├ ○ /cau-chuyen
+├ ○ /checkout
+├ ƒ /danh-muc/[slug]
+├ ○ /dat-hang-thanh-cong
+├ ○ /gio-hang
+├ ○ /ho-tro/doi-tra
+├ ○ /ho-tro/thanh-toan
+├ ○ /ho-tro/tu-van-size
+├ ○ /ho-tro/tuyen-dung
+├ ƒ /san-pham/[slug]
+└ ƒ /tim-kiem
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

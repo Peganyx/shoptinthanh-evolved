@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="1500" viewBox="0 0 1200 1500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="80" y1="80" x2="1120" y2="1420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f7f1ea"/>
+      <stop offset="1" stop-color="#e7d7c4"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1500" rx="48" fill="url(#bg)"/>
+  <rect x="70" y="70" width="1060" height="1360" rx="40" fill="white" stroke="#d7c3ac"/>
+  <rect x="130" y="140" width="320" height="62" rx="31" fill="#1c1c1c"/>
+  <text x="170" y="182" font-size="30" font-family="Arial, Helvetica, sans-serif" font-weight="700" fill="white">Fjällräven</text>
+  <text x="130" y="290" font-size="66" font-family="Arial, Helvetica, sans-serif" font-weight="800" fill="#1c1c1c">Fjällräven Kånken Backpack</text>
+  <rect x="190" y="380" width="820" height="780" rx="44" fill="#f8f5f0" stroke="#d7c3ac"/>
+  <path d="M380 930 C420 610 760 610 820 930" stroke="#1c1c1c" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="450" cy="870" r="42" fill="#1c1c1c"/>
+  <circle cx="750" cy="870" r="42" fill="#1c1c1c"/>
+  <text x="130" y="1290" font-size="34" font-family="Arial, Helvetica, sans-serif" font-weight="600" fill="#5a4b40">Famous product • catalog refresh • local image fallback</text>
+</svg>
