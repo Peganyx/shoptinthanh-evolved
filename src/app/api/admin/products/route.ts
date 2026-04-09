@@ -36,9 +36,13 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "");
 
+    // Check slug collision
+    const existing = await prisma.product.findUnique({ where: { slug } });
+    const finalSlug = existing ? slug + "-" + Date.now() : slug;
+
     const product = await prisma.product.create({
       data: {
-        slug,
+        slug: finalSlug,
         name,
         brand,
         department: department || "nam",
@@ -53,10 +57,10 @@ export async function POST(req: NextRequest) {
         isNew: isNew || false,
         tags: tags || [],
         variants: {
-          create: (variants || []).map((v: { label: string; colorCode: string; sku: string }) => ({
-            label: v.label,
-            colorCode: v.colorCode,
-            sku: v.sku,
+          create: (variants || []).map((v: { label: string; colorCode: string; sku: string }, i: number) => ({
+            label: v.label || "Default",
+            colorCode: v.colorCode || "#000000",
+            sku: v.sku || (finalSlug + "-v" + (i + 1) + "-" + Date.now()),
           })),
         },
       },
@@ -120,13 +124,14 @@ export async function PUT(req: NextRequest) {
     // If variants provided, replace them
     if (newVariants && Array.isArray(newVariants)) {
       await prisma.productVariant.deleteMany({ where: { productId: Number(id) } });
-      for (const v of newVariants) {
+      for (let idx = 0; idx < newVariants.length; idx++) {
+        const v = newVariants[idx];
         await prisma.productVariant.create({
           data: {
             productId: Number(id),
-            label: v.label,
-            colorCode: v.colorCode,
-            sku: v.sku,
+            label: v.label || "Default",
+            colorCode: v.colorCode || "#000000",
+            sku: v.sku || (product.slug + "-v" + idx + "-" + Date.now()),
           },
         });
       }
