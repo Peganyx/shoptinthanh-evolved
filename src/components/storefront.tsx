@@ -36,36 +36,62 @@ function cartKey(item: CartItem) {
   return `${item.slug}__${item.variant}__${item.size}`;
 }
 
+// Shared cart: dispatch custom event so all useCart() instances sync
+const CART_EVENT = "cart-updated";
+
+function persistCart(items: CartItem[]) {
+  window.localStorage.setItem(CART_KEY, JSON.stringify(items));
+  window.dispatchEvent(new Event(CART_EVENT));
+}
+
 function useCart() {
   const [items, setItems] = useState<CartItem[]>(() => (typeof window === "undefined" ? [] : readCart()));
 
+  // Listen for cart changes from OTHER components
   useEffect(() => {
-    window.localStorage.setItem(CART_KEY, JSON.stringify(items));
-  }, [items]);
+    function onCartUpdate() {
+      setItems(readCart());
+    }
+    window.addEventListener(CART_EVENT, onCartUpdate);
+    window.addEventListener("storage", onCartUpdate);
+    return () => {
+      window.removeEventListener(CART_EVENT, onCartUpdate);
+      window.removeEventListener("storage", onCartUpdate);
+    };
+  }, []);
 
   function addItem(next: CartItem) {
-    setItems((current) => {
-      const key = cartKey(next);
-      const matched = current.find((item) => cartKey(item) === key);
-      if (!matched) return [...current, next];
-      return current.map((item) =>
+    const current = readCart();
+    const key = cartKey(next);
+    const matched = current.find((item) => cartKey(item) === key);
+    let updated: CartItem[];
+    if (!matched) {
+      updated = [...current, next];
+    } else {
+      updated = current.map((item) =>
         cartKey(item) === key ? { ...item, quantity: item.quantity + next.quantity } : item,
       );
-    });
+    }
+    setItems(updated);
+    persistCart(updated);
   }
 
   function updateItem(target: CartItem, quantity: number) {
-    setItems((current) =>
-      current
-        .map((item) =>
-          cartKey(item) === cartKey(target) ? { ...item, quantity: Math.max(1, quantity) } : item,
-        )
-        .filter((item) => item.quantity > 0),
-    );
+    const current = readCart();
+    const updated = current
+      .map((item) =>
+        cartKey(item) === cartKey(target) ? { ...item, quantity: Math.max(1, quantity) } : item,
+      )
+      .filter((item) => item.quantity > 0);
+    setItems(updated);
+    persistCart(updated);
   }
 
   function removeItem(target: CartItem) {
-    setItems((current) => current.filter((item) => cartKey(item) !== cartKey(target)));
+    const current = readCart();
+    const updated = current.filter((item) => cartKey(item) !== cartKey(target));
+    setItems(updated);
+    persistCart(updated);
   }
 
   return { items, setItems, addItem, updateItem, removeItem };
@@ -83,7 +109,7 @@ function Header() {
             ☰
           </button>
           <Link href="/" className="shrink-0">
-            <span className="text-xl font-bold tracking-tight"><span className="text-[#b45f06]">Shop</span> Tín Thành</span>
+            <span className="text-xl font-bold uppercase tracking-wider"><span className="text-[#d4a24c]">Tín Thành</span><span className="text-[#d4a24c]"> 3</span></span>
           </Link>
           <nav className="hidden items-center text-[15px] lg:flex">
             {CATEGORIES.map((group) => (
@@ -159,7 +185,7 @@ function Footer() {
     <footer className="mt-16 bg-white pt-10 text-sm text-[#444]">
       <div className="container-shell grid gap-8 border-t pt-10 md:grid-cols-4">
         <div>
-          <span className="text-lg font-bold tracking-tight text-white"><span className="text-[#b45f06]">Shop</span> Tín Thành</span>
+          <span className="text-lg font-bold uppercase tracking-wider"><span className="text-[#d4a24c]">Tín Thành</span><span className="text-[#d4a24c]"> 3</span></span>
           <p className="mt-3">{STORE.address}</p>
           <p>Hotline: {STORE.hotline}</p>
           <p>{STORE.email}</p>
@@ -301,7 +327,7 @@ export function HomePage() {
                     <Image src={src} alt={slide.title} fill className="object-cover object-center" priority={index === 0} />
                     <div className="relative z-10 flex h-full items-end md:items-center" style={{textShadow: "0 2px 12px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.5)"}}>
                       <div className="max-w-[620px] px-6 pb-8 text-white md:px-10 md:pb-0">
-                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-white/80">Shop Tín Thành</p>
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-[#d4a24c]">Tín Thành 3</p>
                         <h1 className="max-w-[12ch] text-3xl font-bold leading-tight md:text-5xl">{slide.title}</h1>
                         <p className="mt-3 max-w-[46ch] text-sm leading-6 text-white/85 md:text-base">{slide.subtitle}</p>
                         <div className="mt-5 inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm">
