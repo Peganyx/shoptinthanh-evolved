@@ -325,12 +325,12 @@ export function HomePage() {
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/25" />
                     <Image src={src} alt={slide.title} fill className="object-cover object-center" priority={index === 0} />
-                    <div className="relative z-10 flex h-full items-end md:items-center" style={{textShadow: "0 2px 12px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.5)"}}>
+                    <div className="relative z-10 flex h-full items-end md:items-center">
                       <div className="max-w-[620px] px-6 pb-8 text-white md:px-10 md:pb-0">
                         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-[#d4a24c]">Tín Thành 3</p>
-                        <h1 className="max-w-[12ch] text-3xl font-bold leading-tight md:text-5xl">{slide.title}</h1>
-                        <p className="mt-3 max-w-[46ch] text-sm leading-6 text-white/85 md:text-base">{slide.subtitle}</p>
-                        <div className="mt-5 inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm">
+                        <h1 className="max-w-[12ch] text-3xl font-bold leading-tight md:text-5xl" style={{textShadow: "0 2px 8px rgba(0,0,0,0.6)"}}>{slide.title}</h1>
+                        <p className="mt-3 max-w-[46ch] text-sm leading-6 text-white/85 md:text-base" style={{textShadow: "0 1px 4px rgba(0,0,0,0.5)"}}>{slide.subtitle}</p>
+                        <div className="mt-5 inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm" style={{textShadow: "none"}}>
                           {slide.cta}
                         </div>
                       </div>
