@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
-2:I[18157,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js","/shoptinthanh-evolved/_next/static/chunks/0k6goxacmua~0.js"],"SupportPage"]
+2:I[18157,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js","/shoptinthanh-evolved/_next/static/chunks/124m5b-0vbsmv.js"],"SupportPage"]
 3:I[97367,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"title":"Phương thức thanh toán","paragraphs":["Hỗ trợ COD và luồng chuyển khoản demo cho mục đích staging.","API checkout được thiết kế mở để có thể nối cổng thanh toán thật ở bước sau."]}],[["$","script","script-0",{"src":"/shoptinthanh-evolved/_next/static/chunks/0k6goxacmua~0.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"LEx_iHdwS_OVveZ-f__9a"}
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"title":"Phương thức thanh toán","paragraphs":["Hỗ trợ COD và luồng chuyển khoản demo cho mục đích staging.","API checkout được thiết kế mở để có thể nối cổng thanh toán thật ở bước sau."]}],[["$","script","script-0",{"src":"/shoptinthanh-evolved/_next/static/chunks/124m5b-0vbsmv.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"cO2Yk2Ro9vkgA2TwpSrLS"}
 5:null

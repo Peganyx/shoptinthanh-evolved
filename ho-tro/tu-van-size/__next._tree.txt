@@ -1,2 +1,2 @@
 :HL["https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"ho-tro","param":null,"prefetchHints":0,"slots":{"children":{"name":"tu-van-size","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"LEx_iHdwS_OVveZ-f__9a"}
+0:{"tree":{"name":"","param":null,"prefetchHints":16,"slots":{"children":{"name":"ho-tro","param":null,"prefetchHints":0,"slots":{"children":{"name":"tu-van-size","param":null,"prefetchHints":0,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":0,"slots":null}}}}}}},"staleTime":300,"buildId":"cO2Yk2Ro9vkgA2TwpSrLS"}
