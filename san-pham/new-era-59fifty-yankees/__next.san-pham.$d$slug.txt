@@ -2,4 +2,4 @@
 2:I[39756,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js"],"default"]
 3:I[37457,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js"],"default"]
 4:[]
-0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"0jJeGLqGT17Qae09-ezOx"}
+0:{"rsc":["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","template":["$","$L3",null,{}]}]]}],"isPartial":false,"staleTime":300,"varyParams":"$W4","buildId":"IEssG_89sjaeAPM6JWXKN"}
