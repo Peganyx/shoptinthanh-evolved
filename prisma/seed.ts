@@ -1,10 +1,15 @@
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 import { PRODUCTS } from "../src/lib/store-data";
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🌱 Seeding database...");
+  console.log("Seeding database...");
 
   // Clear existing data
   await prisma.orderItem.deleteMany();
@@ -30,7 +35,7 @@ async function main() {
         isNew: p.isNew || false,
         tags: p.tags,
         variants: {
-          create: p.colors.map((c) => ({
+          create: p.colors.map((c: { label: string; code: string; sku: string }) => ({
             label: c.label,
             colorCode: c.code,
             sku: c.sku,
@@ -38,11 +43,11 @@ async function main() {
         },
       },
     });
-    console.log(`  ✓ ${product.name}`);
+    console.log("  OK: " + product.name);
   }
 
   const count = await prisma.product.count();
-  console.log(`\n✅ Seeded ${count} products`);
+  console.log("Seeded " + count + " products");
 }
 
 main()
@@ -50,4 +55,7 @@ main()
     console.error(e);
     process.exit(1);
   })
-  .finally(() => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+    await pool.end();
+  });
