@@ -1,6 +1,6 @@
 1:"$Sreact.fragment"
-2:I[18157,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js","/shoptinthanh-evolved/_next/static/chunks/0wu7ztwb_8svo.js"],"ProductPage"]
+2:I[18157,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js","/shoptinthanh-evolved/_next/static/chunks/0ftxdps8up_q~.js"],"ProductPage"]
 3:I[97367,["/shoptinthanh-evolved/_next/static/chunks/04eklj-7j4aqp.js","/shoptinthanh-evolved/_next/static/chunks/0d3shmwh5_nmn.js"],"OutletBoundary"]
 4:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"slug":"champion-reverse-weave-hoodie"}],[["$","script","script-0",{"src":"/shoptinthanh-evolved/_next/static/chunks/0wu7ztwb_8svo.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"0o9cBzRg7tZ_7UJC30hZZ"}
+0:{"rsc":["$","$1","c",{"children":[["$","$L2",null,{"slug":"champion-reverse-weave-hoodie"}],[["$","script","script-0",{"src":"/shoptinthanh-evolved/_next/static/chunks/0ftxdps8up_q~.js","async":true}]],["$","$L3",null,{"children":["$","$4",null,{"name":"Next.MetadataOutlet","children":"$@5"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"RtnJXJIhv6Ec3o4QZQQjK"}
 5:null
