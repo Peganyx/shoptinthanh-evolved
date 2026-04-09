@@ -525,6 +525,7 @@ function ProductDetail({ slug }: { slug: string }) {
   const [size, setSize] = useState(product?.sizes[0] || "");
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(product?.images[0] || "");
+  const [addedFeedback, setAddedFeedback] = useState(false);
 
   if (!product) {
     return (
@@ -610,21 +611,12 @@ function ProductDetail({ slug }: { slug: string }) {
               <button
                 onClick={() => (() => {
                     addItem({ slug: product.slug, variant, size, quantity: qty });
-                    const btn = document.getElementById("add-to-cart-btn");
-                    if (btn) {
-                      btn.textContent = "✓ Đã thêm!";
-                      btn.classList.add("bg-green-600");
-                      btn.classList.remove("bg-black");
-                      setTimeout(() => {
-                        btn.textContent = "Thêm vào giỏ";
-                        btn.classList.remove("bg-green-600");
-                        btn.classList.add("bg-black");
-                      }, 1500);
-                    }
+                    setAddedFeedback(true);
+                    setTimeout(() => setAddedFeedback(false), 1800);
                   })()}
-                className="bg-black px-6 py-3 text-white"
+                className={`px-6 py-3 text-sm font-semibold text-white transition-all duration-300 ${addedFeedback ? "bg-green-600 scale-[1.03]" : "bg-black hover:bg-[#333]"}`}
               >
-                Thêm vào giỏ
+                {addedFeedback ? "✓ Đã thêm vào giỏ!" : "Thêm vào giỏ"}
               </button>
               <a href={STORE.zalo} className="border px-6 py-3">
                 Đặt qua Zalo
@@ -879,9 +871,9 @@ export function StoryPage() {
       <section className="container-shell py-10">
         <h1 className="text-3xl font-bold uppercase">Câu chuyện của Tín Thành</h1>
         <div className="mt-5 max-w-3xl space-y-4 leading-7 text-[#666]">
-          <p>Shop Tín Thành là cửa hàng thời trang địa phương quen thuộc tại Cao Lãnh, Đồng Tháp, nổi bật bởi cách trưng bày sáng, rõ, nhiều danh mục và cảm giác mua sắm thực dụng.</p>
+          <p>Shop Tín Thành được thành lập năm 2018, xuất phát từ niềm đam mê thời trang của anh Tín Thành - một chàng trai trẻ Cao Lãnh luôn muốn mang đến phong cách mới mẻ cho bạn bè và khách hàng.</p>
           <p>Shop Tín Thành là điểm đến tin cậy cho thời trang chính hãng tại Đồng Tháp. Chúng tôi cam kết mang đến sản phẩm chất lượng với giá tốt nhất.</p>
-          <p>Điểm nâng cấp là toàn bộ luồng thương mại điện tử đã hoàn chỉnh hơn: catalog nhiều hơn, ảnh sản phẩm dày hơn, có lọc/tìm kiếm, PDP đầy đủ hơn, cart, checkout, success và API mock bền cho staging.</p>
+          <p>Chúng tôi cam kết 100% hàng chính hãng, giá tốt nhất khu vực và dịch vụ chăm sóc khách hàng tận tâm. Đổi trả trong 7 ngày, ship COD miễn phí nội tỉnh. Ghé thăm tại 65 đường 30/4, P.1, TP. Cao Lãnh hoặc liên hệ Zalo: 0559.433.198</p>
         </div>
       </section>
     </Shell>
