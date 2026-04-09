@@ -329,7 +329,7 @@ export function HomePage() {
                       <div className="max-w-[620px] px-6 pb-8 text-white md:px-10 md:pb-0">
                         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-[#d4a24c]">Tín Thành 3</p>
                         <h1 className="max-w-[12ch] text-3xl font-bold leading-tight md:text-5xl" style={{textShadow: "0 2px 8px rgba(0,0,0,0.6)"}}>{slide.title}</h1>
-                        <p className="mt-3 max-w-[46ch] text-sm leading-6 text-white/85 md:text-base" style={{textShadow: "0 1px 4px rgba(0,0,0,0.5)"}}>{slide.subtitle}</p>
+                        <p className="mt-3 max-w-[46ch] text-sm leading-6 text-white/85 md:text-base" style={{textShadow: "0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5)"}}>{slide.subtitle}</p>
                         <div className="mt-5 inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm" style={{textShadow: "none"}}>
                           {slide.cta}
                         </div>
