@@ -17,7 +17,7 @@ type DashboardStats = {
   dailyChart: { date: string; orders: number; revenue: number }[];
 };
 
-const fmt = (n: number) => n.toLocaleString("vi-VN") + " \u20ab";
+const fmt = (n: number) => n.toLocaleString("vi-VN") + " ₫";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
@@ -28,11 +28,11 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  pending: "Ch\u1edd x\u00e1c nh\u1eadn",
-  confirmed: "\u0110\u00e3 x\u00e1c nh\u1eadn",
-  shipped: "\u0110ang giao",
-  delivered: "\u0110\u00e3 giao",
-  cancelled: "\u0110\u00e3 h\u1ee7y",
+  pending: "Chờ xác nhận",
+  confirmed: "Đã xác nhận",
+  shipped: "Đang giao",
+  delivered: "Đã giao",
+  cancelled: "Đã hủy",
 };
 
 const statusFlow = ["pending", "confirmed", "shipped", "delivered"];
@@ -76,7 +76,7 @@ export default function AdminPage() {
       setAuthed(true);
       fetchData();
     } else {
-      alert("Sai m\u1eadt kh\u1ea9u admin");
+      alert("Sai mật khẩu admin");
     }
     setLoading(false);
   }
@@ -126,12 +126,12 @@ export default function AdminPage() {
       setEditingProduct(null);
     } else {
       const err = await res.json();
-      alert(err.error || "L\u1ed7i l\u01b0u s\u1ea3n ph\u1ea9m");
+      alert(err.error || "Lỗi lưu sản phẩm");
     }
   }
 
   async function deleteProduct(id: number, name: string) {
-    if (!confirm(`X\u00f3a s\u1ea3n ph\u1ea9m "${name}"?`)) return;
+    if (!confirm(`Xóa sản phẩm "${name}"?`)) return;
     const s = getSecret();
     const res = await fetch(`/api/admin/products?id=${id}`, {
       method: "DELETE",
@@ -164,9 +164,9 @@ export default function AdminPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
         <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-2xl">
           <div className="mb-6 text-center">
-            <div className="mb-2 text-4xl">\ud83d\uded2</div>
+            <div className="mb-2 text-4xl">🛒</div>
             <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-            <p className="mt-1 text-sm text-gray-500">Nh\u1eadp m\u1eadt kh\u1ea9u \u0111\u1ec3 truy c\u1eadp</p>
+            <p className="mt-1 text-sm text-gray-500">Nhập mật khẩu để truy cập</p>
           </div>
           <input
             type="password"
@@ -181,7 +181,7 @@ export default function AdminPage() {
             disabled={loading}
             className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 py-3 text-sm font-semibold text-white hover:from-blue-700 hover:to-blue-800 disabled:opacity-50"
           >
-            {loading ? "\u0110ang x\u00e1c th\u1ef1c..." : "\u0110\u0103ng nh\u1eadp"}
+            {loading ? "Đang xác thực..." : "Đăng nhập"}
           </button>
         </div>
       </div>
@@ -196,8 +196,8 @@ export default function AdminPage() {
       <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className="text-xl">\ud83d\uded2</span>
-            <h1 className="text-lg font-bold text-gray-900">Shop T\u00edn Th\u00e0nh Admin</h1>
+            <span className="text-xl">🛒</span>
+            <h1 className="text-lg font-bold text-gray-900">Shop Tín Thành Admin</h1>
           </div>
           <div className="flex gap-1">
             {(["dashboard", "orders", "products"] as const).map((t) => (
@@ -208,17 +208,17 @@ export default function AdminPage() {
                   tab === t ? "bg-blue-600 text-white" : "text-gray-600 hover:bg-gray-100"
                 }`}
               >
-                {t === "dashboard" ? "\ud83d\udcca T\u1ed5ng quan" : t === "orders" ? `\ud83d\udce6 \u0110\u01a1n (${orders.length})` : `\ud83d\udc5f SP (${products.length})`}
+                {t === "dashboard" ? "📊 Tổng quan" : t === "orders" ? `📦 Đơn (${orders.length})` : `👟 SP (${products.length})`}
               </button>
             ))}
             <Link href="/" className="ml-2 rounded-lg border px-3 py-2 text-sm text-gray-500 hover:bg-gray-50">
-              \u2190 Shop
+              ← Shop
             </Link>
             <button
               onClick={() => { localStorage.removeItem("admin-secret"); setAuthed(false); }}
               className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-500 hover:bg-red-50"
             >
-              \u0110\u0103ng xu\u1ea5t
+              Đăng xuất
             </button>
           </div>
         </div>
@@ -229,21 +229,21 @@ export default function AdminPage() {
         {tab === "dashboard" && stats && (
           <div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard label="Doanh thu h\u00f4m nay" value={fmt(stats.todayRevenue)} icon="\ud83d\udcb0" color="green" />
-              <StatCard label="Doanh thu tu\u1ea7n" value={fmt(stats.weekRevenue)} icon="\ud83d\udcc8" color="blue" />
-              <StatCard label="Doanh thu th\u00e1ng" value={fmt(stats.monthRevenue)} icon="\ud83c\udf1f" color="purple" />
-              <StatCard label="\u0110\u01a1n ch\u1edd x\u1eed l\u00fd" value={String(stats.pendingOrders)} icon="\u23f3" color="yellow" />
+              <StatCard label="Doanh thu hôm nay" value={fmt(stats.todayRevenue)} icon="💰" color="green" />
+              <StatCard label="Doanh thu tuần" value={fmt(stats.weekRevenue)} icon="📈" color="blue" />
+              <StatCard label="Doanh thu tháng" value={fmt(stats.monthRevenue)} icon="🌟" color="purple" />
+              <StatCard label="Đơn chờ xử lý" value={String(stats.pendingOrders)} icon="⏳" color="yellow" />
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <MiniStat label="T\u1ed5ng \u0111\u01a1n h\u00e0ng" value={stats.totalOrders} />
-              <MiniStat label="\u0110\u01a1n h\u00f4m nay" value={stats.todayOrderCount} />
-              <MiniStat label="S\u1ea3n ph\u1ea9m" value={stats.totalProducts} />
+              <MiniStat label="Tổng đơn hàng" value={stats.totalOrders} />
+              <MiniStat label="Đơn hôm nay" value={stats.todayOrderCount} />
+              <MiniStat label="Sản phẩm" value={stats.totalProducts} />
             </div>
 
             {/* Simple bar chart */}
             <div className="mt-6 rounded-xl border bg-white p-6 shadow-sm">
-              <h3 className="mb-4 font-semibold text-gray-900">\u0110\u01a1n h\u00e0ng 7 ng\u00e0y g\u1ea7n nh\u1ea5t</h3>
+              <h3 className="mb-4 font-semibold text-gray-900">Đơn hàng 7 ngày gần nhất</h3>
               <div className="flex items-end gap-2" style={{ height: 180 }}>
                 {stats.dailyChart.map((d) => {
                   const maxOrders = Math.max(...stats.dailyChart.map((x) => x.orders), 1);
@@ -276,13 +276,13 @@ export default function AdminPage() {
                     orderFilter === s ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 text-gray-600 hover:bg-gray-50"
                   }`}
                 >
-                  {s === "all" ? `T\u1ea5t c\u1ea3 (${orders.length})` : `${statusLabels[s]} (${orders.filter((o) => o.status === s).length})`}
+                  {s === "all" ? `Tất cả (${orders.length})` : `${statusLabels[s]} (${orders.filter((o) => o.status === s).length})`}
                 </button>
               ))}
             </div>
 
             {filteredOrders.length === 0 ? (
-              <p className="py-12 text-center text-gray-400">Ch\u01b0a c\u00f3 \u0111\u01a1n h\u00e0ng n\u00e0o</p>
+              <p className="py-12 text-center text-gray-400">Chưa có đơn hàng nào</p>
             ) : (
               <div className="space-y-3">
                 {filteredOrders.map((order) => (
@@ -295,15 +295,15 @@ export default function AdminPage() {
                             {statusLabels[order.status]}
                           </span>
                         </div>
-                        <p className="mt-1 text-sm text-gray-700">{order.customerName} \u2022 {order.phone}</p>
+                        <p className="mt-1 text-sm text-gray-700">{order.customerName} • {order.phone}</p>
                         <p className="text-sm text-gray-500">{order.address}</p>
-                        {order.email && <p className="text-sm text-gray-400">\u2709 {order.email}</p>}
-                        {order.note && <p className="mt-1 text-sm text-amber-600">\ud83d\udcdd {order.note}</p>}
+                        {order.email && <p className="text-sm text-gray-400">✉ {order.email}</p>}
+                        {order.note && <p className="mt-1 text-sm text-amber-600">📝 {order.note}</p>}
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-red-600">{fmt(order.total)}</p>
                         <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleString("vi-VN")}</p>
-                        <p className="text-xs text-gray-400">{order.paymentMethod === "cod" ? "COD" : "Chuy\u1ec3n kho\u1ea3n"}</p>
+                        <p className="text-xs text-gray-400">{order.paymentMethod === "cod" ? "COD" : "Chuyển khoản"}</p>
                         {/* Status dropdown */}
                         <select
                           value={order.status}
@@ -321,7 +321,7 @@ export default function AdminPage() {
                       <div className="space-y-1">
                         {order.items?.map((item: AnyObj) => (
                           <div key={item.id} className="flex items-center justify-between text-sm">
-                            <span className="text-gray-700">{item.product?.name || "SP"} \u2022 {item.size} \u2022 x{item.quantity}</span>
+                            <span className="text-gray-700">{item.product?.name || "SP"} • {item.size} • x{item.quantity}</span>
                             <span className="font-medium">{fmt(item.price * item.quantity)}</span>
                           </div>
                         ))}
@@ -338,12 +338,12 @@ export default function AdminPage() {
         {tab === "products" && (
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">S\u1ea3n ph\u1ea9m ({products.length})</h2>
+              <h2 className="text-lg font-semibold text-gray-900">Sản phẩm ({products.length})</h2>
               <button
                 onClick={() => { setEditingProduct(null); setShowProductForm(true); }}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
-                + Th\u00eam s\u1ea3n ph\u1ea9m
+                + Thêm sản phẩm
               </button>
             </div>
 
@@ -360,12 +360,12 @@ export default function AdminPage() {
               <table className="w-full text-sm">
                 <thead className="bg-gray-50">
                   <tr className="text-left">
-                    <th className="px-4 py-3 text-gray-500">\u1ea2nh</th>
-                    <th className="px-4 py-3 text-gray-500">T\u00ean</th>
-                    <th className="px-4 py-3 text-gray-500">Th\u01b0\u01a1ng hi\u1ec7u</th>
-                    <th className="px-4 py-3 text-gray-500">Gi\u00e1</th>
+                    <th className="px-4 py-3 text-gray-500">Ảnh</th>
+                    <th className="px-4 py-3 text-gray-500">Tên</th>
+                    <th className="px-4 py-3 text-gray-500">Thương hiệu</th>
+                    <th className="px-4 py-3 text-gray-500">Giá</th>
                     <th className="px-4 py-3 text-gray-500">Tags</th>
-                    <th className="px-4 py-3 text-gray-500">H\u00e0nh \u0111\u1ed9ng</th>
+                    <th className="px-4 py-3 text-gray-500">Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -389,9 +389,9 @@ export default function AdminPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
-                          {p.featured && <span className="rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">N\u1ed5i b\u1eadt</span>}
-                          {p.bestSeller && <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">B\u00e1n ch\u1ea1y</span>}
-                          {p.isNew && <span className="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">M\u1edbi</span>}
+                          {p.featured && <span className="rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">Nổi bật</span>}
+                          {p.bestSeller && <span className="rounded bg-red-100 px-2 py-0.5 text-xs text-red-700">Bán chạy</span>}
+                          {p.isNew && <span className="rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">Mới</span>}
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -400,13 +400,13 @@ export default function AdminPage() {
                             onClick={() => { setEditingProduct(p); setShowProductForm(true); }}
                             className="rounded bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-100"
                           >
-                            S\u1eeda
+                            Sửa
                           </button>
                           <button
                             onClick={() => deleteProduct(p.id, p.name)}
                             className="rounded bg-red-50 px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-100"
                           >
-                            X\u00f3a
+                            Xóa
                           </button>
                         </div>
                       </td>
@@ -535,52 +535,52 @@ function ProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="mb-6 rounded-xl border bg-white p-6 shadow-sm">
-      <h3 className="mb-4 text-lg font-bold text-gray-900">{product ? "S\u1eeda s\u1ea3n ph\u1ea9m" : "Th\u00eam s\u1ea3n ph\u1ea9m m\u1edbi"}</h3>
+      <h3 className="mb-4 text-lg font-bold text-gray-900">{product ? "Sửa sản phẩm" : "Thêm sản phẩm mới"}</h3>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">T\u00ean s\u1ea3n ph\u1ea9m *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Tên sản phẩm *</label>
           <input value={form.name} onChange={(e) => update("name", e.target.value)} required className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Th\u01b0\u01a1ng hi\u1ec7u *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Thương hiệu *</label>
           <input value={form.brand} onChange={(e) => update("brand", e.target.value)} required className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Gi\u00e1 (VND) *</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Giá (VND) *</label>
           <input type="number" value={form.price} onChange={(e) => update("price", e.target.value)} required className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Gi\u00e1 g\u1ed1c (n\u1ebfu gi\u1ea3m)</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Giá gốc (nếu giảm)</label>
           <input type="number" value={form.compareAtPrice} onChange={(e) => update("compareAtPrice", e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Danh m\u1ee5c</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Danh mục</label>
           <select value={form.department} onChange={(e) => update("department", e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">
             <option value="nam">Nam</option>
-            <option value="nu">N\u1eef</option>
-            <option value="phu-kien">Ph\u1ee5 ki\u1ec7n</option>
+            <option value="nu">Nữ</option>
+            <option value="phu-kien">Phụ kiện</option>
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-gray-700">Lo\u1ea1i</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Loại</label>
           <select value={form.subcategory} onChange={(e) => update("subcategory", e.target.value)} className="w-full rounded-lg border px-3 py-2 text-sm">
-            <option value="giay">Gi\u00e0y</option>
-            <option value="ao">\u00c1o</option>
-            <option value="quan">Qu\u1ea7n</option>
-            <option value="phu-kien">Ph\u1ee5 ki\u1ec7n</option>
+            <option value="giay">Giày</option>
+            <option value="ao">Áo</option>
+            <option value="quan">Quần</option>
+            <option value="phu-kien">Phụ kiện</option>
           </select>
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-gray-700">Sizes (c\u00e1ch nhau b\u1eb1ng d\u1ea5u ph\u1ea9y)</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Sizes (cách nhau bằng dấu phẩy)</label>
           <input value={form.sizes} onChange={(e) => update("sizes", e.target.value)} placeholder="38, 39, 40, 41, 42" className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-gray-700">M\u00f4 t\u1ea3</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Mô tả</label>
           <textarea value={form.description} onChange={(e) => update("description", e.target.value)} rows={3} className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
         <div className="sm:col-span-2">
-          <label className="mb-1 block text-sm font-medium text-gray-700">Tags (c\u00e1ch nhau b\u1eb1ng d\u1ea5u ph\u1ea9y)</label>
+          <label className="mb-1 block text-sm font-medium text-gray-700">Tags (cách nhau bằng dấu phẩy)</label>
           <input value={form.tags} onChange={(e) => update("tags", e.target.value)} placeholder="giay, nike, nam" className="w-full rounded-lg border px-3 py-2 text-sm" />
         </div>
       </div>
@@ -589,21 +589,21 @@ function ProductForm({
       <div className="mt-4 flex gap-6">
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={form.featured} onChange={(e) => update("featured", e.target.checked)} className="rounded" />
-          N\u1ed5i b\u1eadt
+          Nổi bật
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={form.bestSeller} onChange={(e) => update("bestSeller", e.target.checked)} className="rounded" />
-          B\u00e1n ch\u1ea1y
+          Bán chạy
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={form.isNew} onChange={(e) => update("isNew", e.target.checked)} className="rounded" />
-          M\u1edbi
+          Mới
         </label>
       </div>
 
       {/* Images */}
       <div className="mt-4">
-        <label className="mb-2 block text-sm font-medium text-gray-700">H\u00ecnh \u1ea3nh</label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">Hình ảnh</label>
         <div className="flex flex-wrap gap-3">
           {form.images.map((url: string, i: number) => (
             <div key={i} className="group relative h-20 w-20 overflow-hidden rounded-lg border">
@@ -613,7 +613,7 @@ function ProductForm({
                 onClick={() => removeImage(i)}
                 className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100"
               >
-                \u2715
+                ✕
               </button>
             </div>
           ))}
@@ -624,7 +624,7 @@ function ProductForm({
         </div>
         <div className="mt-2">
           <input
-            placeholder="Ho\u1eb7c d\u00e1n URL \u1ea3nh (Enter \u0111\u1ec3 th\u00eam)"
+            placeholder="Hoặc dán URL ảnh (Enter để thêm)"
             className="w-full rounded-lg border px-3 py-2 text-sm"
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -642,13 +642,13 @@ function ProductForm({
 
       {/* Variants */}
       <div className="mt-4">
-        <label className="mb-2 block text-sm font-medium text-gray-700">Bi\u1ebfn th\u1ec3 m\u00e0u</label>
+        <label className="mb-2 block text-sm font-medium text-gray-700">Biến thể màu</label>
         {form.variants.map((v: AnyObj, i: number) => (
           <div key={i} className="mb-2 flex items-center gap-2">
             <input
               value={v.label}
               onChange={(e) => updateVariant(i, "label", e.target.value)}
-              placeholder="T\u00ean m\u00e0u"
+              placeholder="Tên màu"
               className="flex-1 rounded-lg border px-3 py-2 text-sm"
             />
             <input
@@ -664,12 +664,12 @@ function ProductForm({
               className="w-32 rounded-lg border px-3 py-2 text-sm"
             />
             {form.variants.length > 1 && (
-              <button type="button" onClick={() => removeVariant(i)} className="text-red-400 hover:text-red-600">\u2715</button>
+              <button type="button" onClick={() => removeVariant(i)} className="text-red-400 hover:text-red-600">✕</button>
             )}
           </div>
         ))}
         <button type="button" onClick={addVariant} className="mt-1 text-sm text-blue-600 hover:text-blue-800">
-          + Th\u00eam m\u00e0u
+          + Thêm màu
         </button>
       </div>
 
@@ -680,10 +680,10 @@ function ProductForm({
           disabled={saving}
           className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
         >
-          {saving ? "\u0110ang l\u01b0u..." : product ? "C\u1eadp nh\u1eadt" : "T\u1ea1o s\u1ea3n ph\u1ea9m"}
+          {saving ? "Đang lưu..." : product ? "Cập nhật" : "Tạo sản phẩm"}
         </button>
         <button type="button" onClick={onCancel} className="rounded-lg border px-6 py-2 text-sm text-gray-600 hover:bg-gray-50">
-          H\u1ee7y
+          Hủy
         </button>
       </div>
     </form>
