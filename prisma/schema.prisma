@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id             Int              @id @default(autoincrement())
+  slug           String           @unique
+  name           String
+  brand          String
+  department     String
+  subcategory    String
+  price          Int
+  compareAtPrice Int?
+  description    String
+  sizes          String[]
+  images         String[]
+  featured       Boolean          @default(false)
+  bestSeller     Boolean          @default(false)
+  isNew          Boolean          @default(false)
+  tags           String[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  variants       ProductVariant[]
+  orderItems     OrderItem[]
+}
+
+model ProductVariant {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label     String
+  colorCode String
+  sku       String  @unique
+}
+
+model Order {
+  id            Int         @id @default(autoincrement())
+  customerName  String
+  phone         String
+  address       String
+  district      String?
+  note          String?
+  total         Int
+  status        String      @default("pending")
+  paymentMethod String      @default("cod")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id         Int     @id @default(autoincrement())
+  orderId    Int
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  Int
+  product    Product @relation(fields: [productId], references: [id])
+  variantSku String
+  size       String
+  quantity   Int
+  price      Int
+}

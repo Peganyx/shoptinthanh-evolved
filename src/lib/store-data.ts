@@ -111,9 +111,9 @@ export const PRODUCTS: Product[] = [
       "43"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/nike-air-force-1-07.png",
-      "/shoptinthanh-evolved/catalog/nike-air-force-1-07.png",
-      "/shoptinthanh-evolved/catalog/nike-air-force-1-07.png"
+      "/catalog/nike-air-force-1-07.png",
+      "/catalog/nike-air-force-1-07.png",
+      "/catalog/nike-air-force-1-07.png"
     ],
     "featured": true,
     "bestSeller": true,
@@ -154,9 +154,9 @@ export const PRODUCTS: Product[] = [
       "43"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/adidas-samba-og.jpg",
-      "/shoptinthanh-evolved/catalog/adidas-samba-og.jpg",
-      "/shoptinthanh-evolved/catalog/adidas-samba-og.jpg"
+      "/catalog/adidas-samba-og.jpg",
+      "/catalog/adidas-samba-og.jpg",
+      "/catalog/adidas-samba-og.jpg"
     ],
     "featured": true,
     "bestSeller": false,
@@ -197,9 +197,9 @@ export const PRODUCTS: Product[] = [
       "43"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/converse-chuck-taylor-all-star.jpg",
-      "/shoptinthanh-evolved/catalog/converse-chuck-taylor-all-star.jpg",
-      "/shoptinthanh-evolved/catalog/converse-chuck-taylor-all-star.jpg"
+      "/catalog/converse-chuck-taylor-all-star.jpg",
+      "/catalog/converse-chuck-taylor-all-star.jpg",
+      "/catalog/converse-chuck-taylor-all-star.jpg"
     ],
     "featured": true,
     "bestSeller": false,
@@ -240,9 +240,9 @@ export const PRODUCTS: Product[] = [
       "43"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/vans-old-skool.jpg",
-      "/shoptinthanh-evolved/catalog/vans-old-skool.jpg",
-      "/shoptinthanh-evolved/catalog/vans-old-skool.jpg"
+      "/catalog/vans-old-skool.jpg",
+      "/catalog/vans-old-skool.jpg",
+      "/catalog/vans-old-skool.jpg"
     ],
     "featured": true,
     "bestSeller": true,
@@ -283,9 +283,9 @@ export const PRODUCTS: Product[] = [
       "43"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/new-balance-530.jpg",
-      "/shoptinthanh-evolved/catalog/new-balance-530.jpg",
-      "/shoptinthanh-evolved/catalog/new-balance-530.jpg"
+      "/catalog/new-balance-530.jpg",
+      "/catalog/new-balance-530.jpg",
+      "/catalog/new-balance-530.jpg"
     ],
     "featured": true,
     "bestSeller": false,
@@ -328,9 +328,9 @@ export const PRODUCTS: Product[] = [
       "42"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/crocs-classic-clog.jpg",
-      "/shoptinthanh-evolved/catalog/crocs-classic-clog.jpg",
-      "/shoptinthanh-evolved/catalog/crocs-classic-clog.jpg"
+      "/catalog/crocs-classic-clog.jpg",
+      "/catalog/crocs-classic-clog.jpg",
+      "/catalog/crocs-classic-clog.jpg"
     ],
     "featured": true,
     "bestSeller": false,
@@ -372,9 +372,9 @@ export const PRODUCTS: Product[] = [
       "34"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/levis-501-original-fit.jpg",
-      "/shoptinthanh-evolved/catalog/levis-501-original-fit.jpg",
-      "/shoptinthanh-evolved/catalog/levis-501-original-fit.jpg"
+      "/catalog/levis-501-original-fit.jpg",
+      "/catalog/levis-501-original-fit.jpg",
+      "/catalog/levis-501-original-fit.jpg"
     ],
     "featured": true,
     "bestSeller": true,
@@ -414,9 +414,9 @@ export const PRODUCTS: Product[] = [
       "XL"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/levis-trucker-jacket.jpg",
-      "/shoptinthanh-evolved/catalog/levis-trucker-jacket.jpg",
-      "/shoptinthanh-evolved/catalog/levis-trucker-jacket.jpg"
+      "/catalog/levis-trucker-jacket.jpg",
+      "/catalog/levis-trucker-jacket.jpg",
+      "/catalog/levis-trucker-jacket.jpg"
     ],
     "featured": true,
     "bestSeller": false,
@@ -456,9 +456,9 @@ export const PRODUCTS: Product[] = [
       "XL"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/lacoste-l1212-polo.jpg",
-      "/shoptinthanh-evolved/catalog/lacoste-l1212-polo.jpg",
-      "/shoptinthanh-evolved/catalog/lacoste-l1212-polo.jpg"
+      "/catalog/lacoste-l1212-polo.jpg",
+      "/catalog/lacoste-l1212-polo.jpg",
+      "/catalog/lacoste-l1212-polo.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -498,9 +498,9 @@ export const PRODUCTS: Product[] = [
       "XL"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/ralph-lauren-mesh-polo.jpg",
-      "/shoptinthanh-evolved/catalog/ralph-lauren-mesh-polo.jpg",
-      "/shoptinthanh-evolved/catalog/ralph-lauren-mesh-polo.jpg"
+      "/catalog/ralph-lauren-mesh-polo.jpg",
+      "/catalog/ralph-lauren-mesh-polo.jpg",
+      "/catalog/ralph-lauren-mesh-polo.jpg"
     ],
     "featured": false,
     "bestSeller": true,
@@ -540,9 +540,9 @@ export const PRODUCTS: Product[] = [
       "XL"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/champion-reverse-weave-hoodie.jpg",
-      "/shoptinthanh-evolved/catalog/champion-reverse-weave-hoodie.jpg",
-      "/shoptinthanh-evolved/catalog/champion-reverse-weave-hoodie.jpg"
+      "/catalog/champion-reverse-weave-hoodie.jpg",
+      "/catalog/champion-reverse-weave-hoodie.jpg",
+      "/catalog/champion-reverse-weave-hoodie.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -582,9 +582,9 @@ export const PRODUCTS: Product[] = [
       "XL"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/north-face-retro-nuptse.jpg",
-      "/shoptinthanh-evolved/catalog/north-face-retro-nuptse.jpg",
-      "/shoptinthanh-evolved/catalog/north-face-retro-nuptse.jpg"
+      "/catalog/north-face-retro-nuptse.jpg",
+      "/catalog/north-face-retro-nuptse.jpg",
+      "/catalog/north-face-retro-nuptse.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -624,9 +624,9 @@ export const PRODUCTS: Product[] = [
       "XL"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/patagonia-better-sweater.jpg",
-      "/shoptinthanh-evolved/catalog/patagonia-better-sweater.jpg",
-      "/shoptinthanh-evolved/catalog/patagonia-better-sweater.jpg"
+      "/catalog/patagonia-better-sweater.jpg",
+      "/catalog/patagonia-better-sweater.jpg",
+      "/catalog/patagonia-better-sweater.jpg"
     ],
     "featured": false,
     "bestSeller": true,
@@ -667,9 +667,9 @@ export const PRODUCTS: Product[] = [
       "40"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/adidas-gazelle-bold.jpg",
-      "/shoptinthanh-evolved/catalog/adidas-gazelle-bold.jpg",
-      "/shoptinthanh-evolved/catalog/adidas-gazelle-bold.jpg"
+      "/catalog/adidas-gazelle-bold.jpg",
+      "/catalog/adidas-gazelle-bold.jpg",
+      "/catalog/adidas-gazelle-bold.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -710,9 +710,9 @@ export const PRODUCTS: Product[] = [
       "40"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/nike-dunk-low-retro.jpg",
-      "/shoptinthanh-evolved/catalog/nike-dunk-low-retro.jpg",
-      "/shoptinthanh-evolved/catalog/nike-dunk-low-retro.jpg"
+      "/catalog/nike-dunk-low-retro.jpg",
+      "/catalog/nike-dunk-low-retro.jpg",
+      "/catalog/nike-dunk-low-retro.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -753,9 +753,9 @@ export const PRODUCTS: Product[] = [
       "40"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/converse-run-star-hike.jpg",
-      "/shoptinthanh-evolved/catalog/converse-run-star-hike.jpg",
-      "/shoptinthanh-evolved/catalog/converse-run-star-hike.jpg"
+      "/catalog/converse-run-star-hike.jpg",
+      "/catalog/converse-run-star-hike.jpg",
+      "/catalog/converse-run-star-hike.jpg"
     ],
     "featured": false,
     "bestSeller": true,
@@ -796,9 +796,9 @@ export const PRODUCTS: Product[] = [
       "40"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/new-balance-530-women.jpg",
-      "/shoptinthanh-evolved/catalog/new-balance-530-women.jpg",
-      "/shoptinthanh-evolved/catalog/new-balance-530-women.jpg"
+      "/catalog/new-balance-530-women.jpg",
+      "/catalog/new-balance-530-women.jpg",
+      "/catalog/new-balance-530-women.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -840,9 +840,9 @@ export const PRODUCTS: Product[] = [
       "29"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/levis-ribcage-straight-ankle.jpg",
-      "/shoptinthanh-evolved/catalog/levis-ribcage-straight-ankle.jpg",
-      "/shoptinthanh-evolved/catalog/levis-ribcage-straight-ankle.jpg"
+      "/catalog/levis-ribcage-straight-ankle.jpg",
+      "/catalog/levis-ribcage-straight-ankle.jpg",
+      "/catalog/levis-ribcage-straight-ankle.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -882,9 +882,9 @@ export const PRODUCTS: Product[] = [
       "L"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/ralph-lauren-cable-knit-sweater.jpg",
-      "/shoptinthanh-evolved/catalog/ralph-lauren-cable-knit-sweater.jpg",
-      "/shoptinthanh-evolved/catalog/ralph-lauren-cable-knit-sweater.jpg"
+      "/catalog/ralph-lauren-cable-knit-sweater.jpg",
+      "/catalog/ralph-lauren-cable-knit-sweater.jpg",
+      "/catalog/ralph-lauren-cable-knit-sweater.jpg"
     ],
     "featured": false,
     "bestSeller": true,
@@ -923,9 +923,9 @@ export const PRODUCTS: Product[] = [
       "L"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/north-face-womens-denali.jpg",
-      "/shoptinthanh-evolved/catalog/north-face-womens-denali.jpg",
-      "/shoptinthanh-evolved/catalog/north-face-womens-denali.jpg"
+      "/catalog/north-face-womens-denali.jpg",
+      "/catalog/north-face-womens-denali.jpg",
+      "/catalog/north-face-womens-denali.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -962,9 +962,9 @@ export const PRODUCTS: Product[] = [
       "Free size"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/ray-ban-original-wayfarer.jpg",
-      "/shoptinthanh-evolved/catalog/ray-ban-original-wayfarer.jpg",
-      "/shoptinthanh-evolved/catalog/ray-ban-original-wayfarer.jpg"
+      "/catalog/ray-ban-original-wayfarer.jpg",
+      "/catalog/ray-ban-original-wayfarer.jpg",
+      "/catalog/ray-ban-original-wayfarer.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -1001,9 +1001,9 @@ export const PRODUCTS: Product[] = [
       "Free size"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/fjallraven-kanken.jpg",
-      "/shoptinthanh-evolved/catalog/fjallraven-kanken.jpg",
-      "/shoptinthanh-evolved/catalog/fjallraven-kanken.jpg"
+      "/catalog/fjallraven-kanken.jpg",
+      "/catalog/fjallraven-kanken.jpg",
+      "/catalog/fjallraven-kanken.jpg"
     ],
     "featured": false,
     "bestSeller": true,
@@ -1040,9 +1040,9 @@ export const PRODUCTS: Product[] = [
       "Free size"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/herschel-little-america.jpg",
-      "/shoptinthanh-evolved/catalog/herschel-little-america.jpg",
-      "/shoptinthanh-evolved/catalog/herschel-little-america.jpg"
+      "/catalog/herschel-little-america.jpg",
+      "/catalog/herschel-little-america.jpg",
+      "/catalog/herschel-little-america.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -1082,9 +1082,9 @@ export const PRODUCTS: Product[] = [
       "7 3/8"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/new-era-59fifty-yankees.jpg",
-      "/shoptinthanh-evolved/catalog/new-era-59fifty-yankees.jpg",
-      "/shoptinthanh-evolved/catalog/new-era-59fifty-yankees.jpg"
+      "/catalog/new-era-59fifty-yankees.jpg",
+      "/catalog/new-era-59fifty-yankees.jpg",
+      "/catalog/new-era-59fifty-yankees.jpg"
     ],
     "featured": false,
     "bestSeller": false,
@@ -1116,9 +1116,9 @@ export const PRODUCTS: Product[] = [
       "Free size"
     ],
     "images": [
-      "/shoptinthanh-evolved/catalog/casio-f91w.jpg",
-      "/shoptinthanh-evolved/catalog/casio-f91w.jpg",
-      "/shoptinthanh-evolved/catalog/casio-f91w.jpg"
+      "/catalog/casio-f91w.jpg",
+      "/catalog/casio-f91w.jpg",
+      "/catalog/casio-f91w.jpg"
     ],
     "featured": false,
     "bestSeller": true,

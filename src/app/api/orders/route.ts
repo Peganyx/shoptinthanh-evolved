@@ -1,0 +1,67 @@
+export const dynamic = "force-dynamic";
+
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+
+// POST /api/orders - Create a new order
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { customerName, phone, address, district, note, paymentMethod, items } = body;
+
+    if (!customerName || !phone || !address || !items?.length) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Calculate total
+    let total = 0;
+    for (const item of items) {
+      total += item.price * item.quantity;
+    }
+
+    const order = await prisma.order.create({
+      data: {
+        customerName,
+        phone,
+        address,
+        district: district || null,
+        note: note || null,
+        total,
+        paymentMethod: paymentMethod || "cod",
+        items: {
+          create: items.map((item: { productId: number; variantSku: string; size: string; quantity: number; price: number }) => ({
+            productId: item.productId,
+            variantSku: item.variantSku,
+            size: item.size,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      },
+      include: { items: true },
+    });
+
+    return NextResponse.json({ success: true, orderId: order.id }, { status: 201 });
+  } catch (error) {
+    console.error("Order creation error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+// GET /api/orders - List orders (admin only)
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const secret = searchParams.get("secret");
+
+  if (secret !== process.env.ADMIN_SECRET) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const orders = await prisma.order.findMany({
+    include: { items: { include: { product: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+
+  return NextResponse.json(orders);
+}

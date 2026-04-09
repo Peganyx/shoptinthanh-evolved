@@ -18,7 +18,7 @@ type CartItem = { slug: string; variant: string; size: string; quantity: number 
 type StoredOrder = { id: string; status: string; total: number } | null;
 
 const CART_KEY = "shoptinthanh-evolved-cart";
-const banners = ["/shoptinthanh-evolved/ref/1.jpg", "/shoptinthanh-evolved/ref/2.jpg", "/shoptinthanh-evolved/ref/3.jpg", "/shoptinthanh-evolved/ref/4.jpg", "/shoptinthanh-evolved/ref/5.jpg"];
+const banners = ["/ref/1.jpg", "/ref/2.jpg", "/ref/3.jpg", "/ref/4.jpg", "/ref/5.jpg"];
 const sortOptions = [
   { value: "featured", label: "Nổi bật" },
   { value: "price-asc", label: "Giá tăng dần" },
@@ -775,7 +775,7 @@ export function CheckoutPage() {
       items,
       notes: formData.get("notes"),
     };
-    alert("Cảm ơn bạn! Đơn hàng đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận trong 24h."); window.location.href = "/shoptinthanh-evolved/"; return; const res = await fetch("/api/checkout", {
+    alert("Cảm ơn bạn! Đơn hàng đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận trong 24h."); window.location.href = "/"; return; const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
