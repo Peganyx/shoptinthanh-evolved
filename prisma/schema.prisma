@@ -23,6 +23,7 @@ model Product {
   bestSeller     Boolean          @default(false)
   isNew          Boolean          @default(false)
   tags           String[]
+  inStock        Boolean          @default(true)
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   variants       ProductVariant[]
@@ -41,6 +42,7 @@ model ProductVariant {
 model Order {
   id            Int         @id @default(autoincrement())
   customerName  String
+  email         String?
   phone         String
   address       String
   district      String?

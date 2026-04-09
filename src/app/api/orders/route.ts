@@ -7,7 +7,7 @@ import { prisma } from "@/lib/db";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { customerName, phone, address, district, note, paymentMethod, items } = body;
+    const { customerName, email, phone, address, district, note, paymentMethod, items } = body;
 
     if (!customerName || !phone || !address || !items?.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     const order = await prisma.order.create({
       data: {
         customerName,
+        email: email || null,
         phone,
         address,
         district: district || null,
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
       include: { items: true },
     });
 
-    return NextResponse.json({ success: true, orderId: order.id }, { status: 201 });
+    return NextResponse.json({ success: true, orderId: order.id, total: order.total }, { status: 201 });
   } catch (error) {
     console.error("Order creation error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
   const orders = await prisma.order.findMany({
     include: { items: { include: { product: true } } },
     orderBy: { createdAt: "desc" },
-    take: 50,
+    take: 100,
   });
 
   return NextResponse.json(orders);

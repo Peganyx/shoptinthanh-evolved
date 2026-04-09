@@ -756,38 +756,61 @@ export function CheckoutPage() {
   const subtotal = rows.reduce((sum, row) => sum + row.product.price * row.quantity, 0);
   const shipping = rows.length ? (subtotal >= 300000 ? 0 : 30000) : 0;
 
+  const [submitting, setSubmitting] = useState(false);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setSubmitting(true);
     const formData = new FormData(event.currentTarget);
-    const payload = {
-      customer: {
-        firstName: formData.get("firstName"),
-        lastName: formData.get("lastName"),
-        email: formData.get("email"),
-        phone: formData.get("phone"),
-        address: formData.get("address"),
-        city: formData.get("city"),
-        postalCode: formData.get("postalCode"),
-      },
-      paymentMethod: formData.get("paymentMethod"),
-      shippingMethod: formData.get("shippingMethod"),
-      items,
-      notes: formData.get("notes"),
-    };
-    alert("Cảm ơn bạn! Đơn hàng đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận trong 24h."); window.location.href = "/"; return; const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error?.message || data.error || "Lỗi checkout");
-      return;
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
+
+    try {
+      const orderItems = rows.map((row) => ({
+        productId: 0,
+        productSlug: row.slug,
+        variantSku: row.variant,
+        size: row.size,
+        quantity: row.quantity,
+        price: row.product.price,
+      }));
+
+      const productsRes = await fetch("/api/products");
+      const allProducts = await productsRes.json();
+      for (const item of orderItems) {
+        const found = allProducts.find((p: { slug: string; id: number }) => p.slug === item.productSlug);
+        if (found) item.productId = found.id;
+      }
+
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: `${lastName} ${firstName}`.trim(),
+          email: formData.get("email") || null,
+          phone: formData.get("phone"),
+          address: `${formData.get("address")}, ${formData.get("city")}`,
+          note: formData.get("notes") || null,
+          paymentMethod: formData.get("paymentMethod") || "cod",
+          items: orderItems.filter((i) => i.productId > 0),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Lỗi đặt hàng");
+        setSubmitting(false);
+        return;
+      }
+
+      localStorage.setItem("last-order", JSON.stringify({ id: data.orderId, total: data.total, status: "pending" }));
+      setItems([]);
+      window.location.href = "/dat-hang-thanh-cong";
+    } catch {
+      setError("Lỗi kết nối. Vui lòng thử lại.");
+      setSubmitting(false);
     }
-    localStorage.setItem("last-order", JSON.stringify(data.order));
-    setItems([]);
-    window.location.href = "/dat-hang-thanh-cong";
   }
 
   return (
@@ -818,7 +841,7 @@ export function CheckoutPage() {
             </div>
             <textarea name="notes" className="mt-4 min-h-28 w-full border p-3" placeholder="Ghi chú giao hàng" />
             {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-            <button className="mt-5 bg-black px-6 py-3 text-white">Xác nhận đơn hàng</button>
+            <button disabled={submitting} className="mt-5 bg-black px-6 py-3 text-white disabled:opacity-50">{submitting ? "Đang xử lý..." : "Xác nhận đơn hàng"}</button>
           </form>
 
           <div className="border p-5">
