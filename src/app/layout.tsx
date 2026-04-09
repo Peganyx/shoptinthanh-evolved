@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Shop Tín Thành Evolved",
+  title: "Shop Tín Thành - Thời trang chính hãng tại Cao Lãnh",
   description:
-    "Phiên bản phát triển hơn của Shop Tín Thành: UI/UX bám layout gốc nhưng có catalog thật, cart, checkout và trải nghiệm mua sắm hoàn chỉnh hơn.",
+    "Shop Tín Thành - Chuyên cung cấp giày dép, quần áo và phụ kiện thời trang chính hãng tại 65 đường 30/4, Cao Lãnh, Đồng Tháp. Hotline: 0559.433.198",
 };
 
 const inlineBaseStyles = `

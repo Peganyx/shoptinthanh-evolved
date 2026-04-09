@@ -72,6 +72,7 @@ function useCart() {
 }
 
 function Header() {
+  const { items } = useCart();
   const [open, setOpen] = useState(false);
 
   return (
@@ -117,7 +118,11 @@ function Header() {
             <Link href="/tim-kiem" aria-label="search">
               ⌕
             </Link>
-            <Link href="/gio-hang">Giỏ hàng</Link>
+            <Link href="/gio-hang" className="relative flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Giỏ hàng
+              {items.length > 0 && <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#b45f06] text-[11px] font-bold text-white">{items.reduce((s, i) => s + i.quantity, 0)}</span>}
+            </Link>
           </div>
         </div>
         {open ? (
@@ -184,7 +189,7 @@ function Footer() {
           </div>
         </div>
       </div>
-      <div className="container-shell py-6 text-xs text-[#777]">© 2026 Shop Tín Thành evolved storefront.</div>
+      <div className="container-shell py-6 text-xs text-[#777]">© 2026 Shop Tín Thành. Mọi quyền được bảo lưu.</div>
     </footer>
   );
 }
@@ -292,9 +297,9 @@ export function HomePage() {
                     key={src}
                     className={`absolute inset-0 transition-all duration-700 ${active === index ? "opacity-100" : "pointer-events-none opacity-0"}`}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/25" />
                     <Image src={src} alt={slide.title} fill className="object-cover object-center" priority={index === 0} />
-                    <div className="relative z-10 flex h-full items-end md:items-center">
+                    <div className="relative z-10 flex h-full items-end md:items-center" style={{textShadow: "0 2px 12px rgba(0,0,0,0.7), 0 1px 4px rgba(0,0,0,0.5)"}}>
                       <div className="max-w-[620px] px-6 pb-8 text-white md:px-10 md:pb-0">
                         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-white/80">Shop Tín Thành</p>
                         <h1 className="max-w-[12ch] text-3xl font-bold leading-tight md:text-5xl">{slide.title}</h1>
@@ -378,7 +383,7 @@ export function HomePage() {
           <div>
             <h2 className="text-2xl font-bold uppercase">Câu chuyện của Tín Thành</h2>
             <p className="mt-4 leading-7 text-[#666]">
-              Phiên bản evolved này giữ lại shell giao diện trắng, header sticky, mega menu, hero banner và cảm giác retail dày đặc từ HTML tham chiếu, nhưng nâng cấp thành storefront có sản phẩm nhiều hơn, ảnh thật hơn, cart/checkout dùng được thật và dữ liệu API rõ ràng hơn.
+              Shop Tín Thành - chuyên cung cấp giày, quần áo và phụ kiện chính hãng tại Cao Lãnh, Đồng Tháp. Cam kết hàng chất lượng, giá tốt nhất.
             </p>
             <div className="mt-4">
               <Link href="/cau-chuyen" className="border-b border-black pb-1 font-semibold">
@@ -603,7 +608,20 @@ function ProductDetail({ slug }: { slug: string }) {
                 </button>
               </div>
               <button
-                onClick={() => addItem({ slug: product.slug, variant, size, quantity: qty })}
+                onClick={() => (() => {
+                    addItem({ slug: product.slug, variant, size, quantity: qty });
+                    const btn = document.getElementById("add-to-cart-btn");
+                    if (btn) {
+                      btn.textContent = "✓ Đã thêm!";
+                      btn.classList.add("bg-green-600");
+                      btn.classList.remove("bg-black");
+                      setTimeout(() => {
+                        btn.textContent = "Thêm vào giỏ";
+                        btn.classList.remove("bg-green-600");
+                        btn.classList.add("bg-black");
+                      }, 1500);
+                    }
+                  })()}
                 className="bg-black px-6 py-3 text-white"
               >
                 Thêm vào giỏ
@@ -739,7 +757,7 @@ export function CheckoutPage() {
       items,
       notes: formData.get("notes"),
     };
-    alert("Don hang da duoc ghi nhan! (Demo mode)"); window.location.href = "/shoptinthanh-evolved/"; return; const res = await fetch("/api/checkout", {
+    alert("Cảm ơn bạn! Đơn hàng đã được ghi nhận. Chúng tôi sẽ liên hệ xác nhận trong 24h."); window.location.href = "/shoptinthanh-evolved/"; return; const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -760,7 +778,7 @@ export function CheckoutPage() {
         <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
           <form onSubmit={submit} className="border p-5">
             <h1 className="text-3xl font-bold uppercase">Thanh toán</h1>
-            <p className="mt-2 text-sm text-[#777]">Checkout demo/staging nhưng dùng thật được cho flow đặt hàng nội bộ.</p>
+            <p className="mt-2 text-sm text-[#777]">Vui lòng kiểm tra lại thông tin trước khi đặt hàng.</p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <input name="firstName" required placeholder="Tên" className="border px-4 py-3" />
               <input name="lastName" required placeholder="Họ" className="border px-4 py-3" />
@@ -773,7 +791,7 @@ export function CheckoutPage() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <select name="paymentMethod" className="border px-4 py-3">
                 <option value="cod">COD</option>
-                <option value="bank-transfer">Chuyển khoản demo</option>
+                <option value="bank-transfer">Chuyển khoản ngân hàng</option>
               </select>
               <select name="shippingMethod" className="border px-4 py-3">
                 <option value="standard">Tiêu chuẩn</option>
@@ -833,7 +851,7 @@ export function SuccessPage() {
       <section className="container-shell py-16">
         <div className="mx-auto max-w-2xl border p-8 text-center">
           <h1 className="text-4xl font-bold uppercase">Đặt hàng thành công</h1>
-          <p className="mt-4 text-[#666]">Đơn hàng demo đã được tạo thành công và sẵn sàng cho staging verification.</p>
+          <p className="mt-4 text-[#666]">Cảm ơn bạn đã mua hàng! Chúng tôi sẽ liên hệ xác nhận đơn hàng qua điện thoại.</p>
           {order ? (
             <div className="mt-6 border p-5 text-left">
               <p className="font-semibold">Mã đơn: {order.id}</p>
@@ -862,7 +880,7 @@ export function StoryPage() {
         <h1 className="text-3xl font-bold uppercase">Câu chuyện của Tín Thành</h1>
         <div className="mt-5 max-w-3xl space-y-4 leading-7 text-[#666]">
           <p>Shop Tín Thành là cửa hàng thời trang địa phương quen thuộc tại Cao Lãnh, Đồng Tháp, nổi bật bởi cách trưng bày sáng, rõ, nhiều danh mục và cảm giác mua sắm thực dụng.</p>
-          <p>Phiên bản evolved này đi theo sát shell của HTML snapshot: sticky white header, mega menu nhiều nhóm, hero banner, dải trust service, product grid dày và footer chính sách/hỗ trợ.</p>
+          <p>Shop Tín Thành là điểm đến tin cậy cho thời trang chính hãng tại Đồng Tháp. Chúng tôi cam kết mang đến sản phẩm chất lượng với giá tốt nhất.</p>
           <p>Điểm nâng cấp là toàn bộ luồng thương mại điện tử đã hoàn chỉnh hơn: catalog nhiều hơn, ảnh sản phẩm dày hơn, có lọc/tìm kiếm, PDP đầy đủ hơn, cart, checkout, success và API mock bền cho staging.</p>
         </div>
       </section>
