@@ -1,2 +1,23 @@
+"use client";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import { ListingPage } from "@/components/storefront";
-export default async function Page({ searchParams }: { searchParams: Promise<{ department?: string; subcategory?: string; search?: string }> }) { const params = await searchParams; return <ListingPage department={params.department} subcategory={params.subcategory} search={params.search} />; }
+
+function SearchContent() {
+  const searchParams = useSearchParams();
+  return (
+    <ListingPage
+      department={searchParams.get("department") || undefined}
+      subcategory={searchParams.get("subcategory") || undefined}
+      search={searchParams.get("search") || undefined}
+    />
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchContent />
+    </Suspense>
+  );
+}

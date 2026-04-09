@@ -18,7 +18,7 @@ type CartItem = { slug: string; variant: string; size: string; quantity: number 
 type StoredOrder = { id: string; status: string; total: number } | null;
 
 const CART_KEY = "shoptinthanh-evolved-cart";
-const banners = ["/ref/1.png", "/ref/2.png", "/ref/3.png", "/ref/4.png", "/ref/5.png"];
+const banners = ["/shoptinthanh-evolved/ref/1.jpg", "/shoptinthanh-evolved/ref/2.jpg", "/shoptinthanh-evolved/ref/3.jpg", "/shoptinthanh-evolved/ref/4.jpg", "/shoptinthanh-evolved/ref/5.jpg"];
 const sortOptions = [
   { value: "featured", label: "Nổi bật" },
   { value: "price-asc", label: "Giá tăng dần" },
@@ -82,7 +82,7 @@ function Header() {
             ☰
           </button>
           <Link href="/" className="shrink-0">
-            <Image src="/ref/logo.png" alt="Shop Tín Thành" width={210} height={80} />
+            <span className="text-xl font-bold tracking-tight"><span className="text-[#b45f06]">Shop</span> Tín Thành</span>
           </Link>
           <nav className="hidden items-center text-[15px] lg:flex">
             {CATEGORIES.map((group) => (
@@ -154,7 +154,7 @@ function Footer() {
     <footer className="mt-16 bg-white pt-10 text-sm text-[#444]">
       <div className="container-shell grid gap-8 border-t pt-10 md:grid-cols-4">
         <div>
-          <Image src="/ref/logo-footer.png" alt="Shop Tín Thành" width={180} height={80} />
+          <span className="text-lg font-bold tracking-tight text-white"><span className="text-[#b45f06]">Shop</span> Tín Thành</span>
           <p className="mt-3">{STORE.address}</p>
           <p>Hotline: {STORE.hotline}</p>
           <p>{STORE.email}</p>
@@ -251,33 +251,105 @@ export function HomePage() {
   const [active, setActive] = useState(0);
 
   useEffect(() => {
-    const id = window.setInterval(() => setActive((value) => (value + 1) % banners.length), 3500);
+    const id = window.setInterval(() => setActive((value) => (value + 1) % banners.length), 5000);
     return () => window.clearInterval(id);
   }, []);
 
   const featured = PRODUCTS.filter((product) => product.featured).slice(0, 10);
   const best = PRODUCTS.filter((product) => product.bestSeller).slice(0, 10);
   const fresh = PRODUCTS.filter((product) => product.isNew).slice(0, 10);
+  const heroSlides = [
+    {
+      title: "Bộ sưu tập hè mới",
+      subtitle: "Form dễ mặc, phối nhanh, lên hình đẹp",
+      cta: "Khám phá ngay",
+    },
+    {
+      title: "Hàng mới về mỗi tuần",
+      subtitle: "Update liên tục những mẫu đang được hỏi nhiều",
+      cta: "Xem sản phẩm",
+    },
+    {
+      title: "Giá ổn, đồ xịn, chốt nhanh",
+      subtitle: "Chọn sẵn outfit đi học, đi chơi, đi làm",
+      cta: "Mua ngay",
+    },
+  ];
+
+  const goPrev = () => setActive((value) => (value - 1 + banners.length) % banners.length);
+  const goNext = () => setActive((value) => (value + 1) % banners.length);
 
   return (
     <Shell>
       <main className="mb-16 space-y-14">
-        <section className="relative mx-auto max-w-[1920px]">
-          <div className="relative aspect-[16/7] min-h-[280px] overflow-hidden bg-white">
-            {banners.map((src, index) => (
-              <div key={src} className={`absolute inset-0 transition-opacity duration-700 ${active === index ? "opacity-100" : "opacity-0"}`}>
-                <Image src={src} alt="banner" fill className="object-contain" priority={index === 0} />
+        <section className="relative mx-auto max-w-[1920px] px-4 sm:px-6 xl:px-10">
+          <div className="relative overflow-hidden rounded-[28px] bg-[#f6f6f6] shadow-[0_18px_50px_rgba(0,0,0,0.08)]">
+            <div className="relative aspect-[16/8] min-h-[320px] md:min-h-[420px]">
+              {banners.map((src, index) => {
+                const slide = heroSlides[index] || heroSlides[0];
+                return (
+                  <div
+                    key={src}
+                    className={`absolute inset-0 transition-all duration-700 ${active === index ? "opacity-100" : "pointer-events-none opacity-0"}`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/10 to-transparent" />
+                    <Image src={src} alt={slide.title} fill className="object-cover object-center" priority={index === 0} />
+                    <div className="relative z-10 flex h-full items-end md:items-center">
+                      <div className="max-w-[620px] px-6 pb-8 text-white md:px-10 md:pb-0">
+                        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.32em] text-white/80">Shop Tín Thành</p>
+                        <h1 className="max-w-[12ch] text-3xl font-bold leading-tight md:text-5xl">{slide.title}</h1>
+                        <p className="mt-3 max-w-[46ch] text-sm leading-6 text-white/85 md:text-base">{slide.subtitle}</p>
+                        <div className="mt-5 inline-flex items-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-black shadow-sm">
+                          {slide.cta}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="absolute inset-x-0 top-1/2 z-20 hidden -translate-y-1/2 justify-between px-4 md:flex">
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-white/92 text-lg text-black shadow-md transition hover:scale-105"
+                  aria-label="Banner trước"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={goNext}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-white/92 text-lg text-black shadow-md transition hover:scale-105"
+                  aria-label="Banner tiếp theo"
+                >
+                  ›
+                </button>
               </div>
-            ))}
+
+              <div className="absolute inset-x-0 bottom-0 z-20 h-1 bg-white/20">
+                <div
+                  className="h-full bg-black/80 transition-all duration-500"
+                  style={{ width: `${((active + 1) / banners.length) * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
-          <div className="mt-3 flex justify-center gap-2">
-            {banners.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setActive(index)}
-                className={`h-2.5 w-2.5 rounded-full ${active === index ? "bg-[#444]" : "bg-[#d7d7d7]"}`}
-              />
-            ))}
+
+          <div className="mt-4 flex items-center justify-between gap-4 px-1">
+            <div className="hidden text-sm text-[#555] md:block">
+              {String(active + 1).padStart(2, "0")} / {String(banners.length).padStart(2, "0")}
+            </div>
+            <div className="flex flex-1 justify-center gap-2 md:justify-end">
+              {banners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActive(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${active === index ? "w-10 bg-black" : "w-2 bg-[#cfcfcf] hover:bg-[#999]"}`}
+                  aria-label={`Chuyển tới banner ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
@@ -667,7 +739,7 @@ export function CheckoutPage() {
       items,
       notes: formData.get("notes"),
     };
-    const res = await fetch("/api/checkout", {
+    alert("Don hang da duoc ghi nhan! (Demo mode)"); window.location.href = "/shoptinthanh-evolved/"; return; const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
