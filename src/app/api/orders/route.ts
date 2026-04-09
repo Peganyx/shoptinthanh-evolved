@@ -50,10 +50,9 @@ export async function POST(req: NextRequest) {
 
 // GET /api/orders - List orders (admin only)
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const secret = searchParams.get("secret");
+  const secret = req.headers.get("x-admin-secret");
 
-  if (secret !== process.env.ADMIN_SECRET) {
+  if (!secret || secret !== process.env.ADMIN_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

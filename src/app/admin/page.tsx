@@ -50,7 +50,7 @@ export default function AdminPage() {
   async function login() {
     setLoading(true);
     try {
-      const res = await fetch(`/api/orders?secret=${secret}`);
+      const res = await fetch("/api/orders", { headers: { "x-admin-secret": secret } });
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
