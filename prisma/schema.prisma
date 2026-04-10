@@ -14,8 +14,8 @@ model Product {
   brand          String
   department     String
   subcategory    String
-  price          Int
-  compareAtPrice Int?
+  price          BigInt
+  compareAtPrice BigInt?
   description    String
   sizes          String[]
   images         String[]
@@ -47,7 +47,7 @@ model Order {
   address       String
   district      String?
   note          String?
-  total         Int
+  total         BigInt
   status        String      @default("pending")
   paymentMethod String      @default("cod")
   createdAt     DateTime    @default(now())
@@ -64,5 +64,5 @@ model OrderItem {
   variantSku String
   size       String
   quantity   Int
-  price      Int
+  price      BigInt
 }

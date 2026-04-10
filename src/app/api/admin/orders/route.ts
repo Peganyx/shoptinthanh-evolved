@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 
 function checkAuth(req: NextRequest) {
   const secret = req.headers.get("x-admin-secret");
@@ -35,7 +36,7 @@ export async function PATCH(req: NextRequest) {
       data: { status },
     });
 
-    return NextResponse.json(order);
+    return NextResponse.json(serializeBigInt(order));
   } catch (error) {
     console.error("Update order error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -55,29 +56,27 @@ export async function GET(req: NextRequest) {
     weekStart.setDate(weekStart.getDate() - 7);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [totalOrders, pendingOrders, todayOrders, weekOrders, monthOrders, totalProducts, allOrders] = await Promise.all([
-      prisma.order.count(),
-      prisma.order.count({ where: { status: "pending" } }),
-      prisma.order.findMany({ where: { createdAt: { gte: todayStart } } }),
-      prisma.order.findMany({ where: { createdAt: { gte: weekStart } } }),
-      prisma.order.findMany({ where: { createdAt: { gte: monthStart } } }),
-      prisma.product.count(),
-      prisma.order.findMany({
-        where: { createdAt: { gte: weekStart } },
-        select: { createdAt: true, total: true, status: true },
-        orderBy: { createdAt: "asc" },
-      }),
-    ]);
+    const totalOrders = await prisma.order.count();
+    const pendingOrders = await prisma.order.count({ where: { status: "pending" } });
+    const todayOrders = await prisma.order.findMany({ where: { createdAt: { gte: todayStart } } });
+    const weekOrders = await prisma.order.findMany({ where: { createdAt: { gte: weekStart } } });
+    const monthOrders = await prisma.order.findMany({ where: { createdAt: { gte: monthStart } } });
+    const totalProducts = await prisma.product.count();
+    const allOrders = await prisma.order.findMany({
+      where: { createdAt: { gte: weekStart } },
+      select: { createdAt: true, total: true, status: true },
+      orderBy: { createdAt: "asc" },
+    });
 
     const todayRevenue = todayOrders
       .filter(o => o.status !== "cancelled")
-      .reduce((sum, o) => sum + o.total, 0);
+      .reduce((sum: number, o) => sum + Number(o.total), 0);
     const weekRevenue = weekOrders
       .filter(o => o.status !== "cancelled")
-      .reduce((sum, o) => sum + o.total, 0);
+      .reduce((sum: number, o) => sum + Number(o.total), 0);
     const monthRevenue = monthOrders
       .filter(o => o.status !== "cancelled")
-      .reduce((sum, o) => sum + o.total, 0);
+      .reduce((sum: number, o) => sum + Number(o.total), 0);
 
     // Group orders by day for chart
     const dailyData: Record<string, { orders: number; revenue: number }> = {};
@@ -92,7 +91,7 @@ export async function GET(req: NextRequest) {
       if (dailyData[key]) {
         dailyData[key].orders++;
         if (order.status !== "cancelled") {
-          dailyData[key].revenue += order.total;
+          dailyData[key].revenue += Number(order.total);
         }
       }
     }

@@ -2,6 +2,9 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
+
+
 
 // GET /api/products - List products with optional filters
 export async function GET(req: NextRequest) {
@@ -30,5 +33,6 @@ export async function GET(req: NextRequest) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(products);
+  return NextResponse.json(serializeBigInt(products));
 }
+

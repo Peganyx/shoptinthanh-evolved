@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 
 // POST /api/orders - Create a new order
 export async function POST(req: NextRequest) {
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
         address,
         district: district || null,
         note: note || null,
-        total,
+        total: BigInt(Math.round(total)),
         paymentMethod: paymentMethod || "cod",
         items: {
           create: items.map((item: { productId: number; variantSku: string; size: string; quantity: number; price: number }) => ({
@@ -35,14 +36,14 @@ export async function POST(req: NextRequest) {
             variantSku: item.variantSku,
             size: item.size,
             quantity: item.quantity,
-            price: item.price,
+            price: BigInt(Math.round(item.price)),
           })),
         },
       },
       include: { items: true },
     });
 
-    return NextResponse.json({ success: true, orderId: order.id, total: order.total }, { status: 201 });
+    return NextResponse.json({ success: true, orderId: order.id, total: Number(order.total) }, { status: 201 });
   } catch (error) {
     console.error("Order creation error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -63,5 +64,5 @@ export async function GET(req: NextRequest) {
     take: 100,
   });
 
-  return NextResponse.json(orders);
+  return NextResponse.json(serializeBigInt(orders));
 }

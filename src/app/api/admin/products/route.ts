@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { serializeBigInt } from "@/lib/serialize";
 
 function checkAuth(req: NextRequest) {
   const secret = req.headers.get("x-admin-secret");
@@ -10,6 +11,8 @@ function checkAuth(req: NextRequest) {
   }
   return true;
 }
+
+
 
 // POST /api/admin/products - Create product
 export async function POST(req: NextRequest) {
@@ -28,6 +31,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Validate price is a valid number
+    const priceNum = Number(price);
+    if (!Number.isFinite(priceNum) || priceNum <= 0) {
+      return NextResponse.json({ error: "Giá phải là số dương hợp lệ" }, { status: 400 });
+    }
+
     // Generate slug from name
     const slug = name
       .toLowerCase()
@@ -40,6 +49,15 @@ export async function POST(req: NextRequest) {
     const existing = await prisma.product.findUnique({ where: { slug } });
     const finalSlug = existing ? slug + "-" + Date.now() : slug;
 
+    // Filter out empty variants
+    const validVariants = (variants || [])
+      .filter((v: { label: string }) => v.label && v.label.trim())
+      .map((v: { label: string; colorCode: string; sku: string }, i: number) => ({
+        label: v.label.trim(),
+        colorCode: v.colorCode || "#000000",
+        sku: v.sku?.trim() || (finalSlug + "-v" + (i + 1) + "-" + Date.now()),
+      }));
+
     const product = await prisma.product.create({
       data: {
         slug: finalSlug,
@@ -47,8 +65,8 @@ export async function POST(req: NextRequest) {
         brand,
         department: department || "nam",
         subcategory: subcategory || "giay",
-        price: Number(price),
-        compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
+        price: BigInt(Math.round(priceNum)),
+        compareAtPrice: compareAtPrice ? BigInt(Math.round(Number(compareAtPrice))) : null,
         description: description || "",
         sizes: sizes || [],
         images: images || [],
@@ -56,23 +74,20 @@ export async function POST(req: NextRequest) {
         bestSeller: bestSeller || false,
         isNew: isNew || false,
         tags: tags || [],
-        variants: {
-          create: (variants || []).map((v: { label: string; colorCode: string; sku: string }, i: number) => ({
-            label: v.label || "Default",
-            colorCode: v.colorCode || "#000000",
-            sku: v.sku || (finalSlug + "-v" + (i + 1) + "-" + Date.now()),
-          })),
-        },
+        variants: validVariants.length > 0 ? {
+          create: validVariants,
+        } : undefined,
       },
       include: { variants: true },
     });
 
-    return NextResponse.json(product, { status: 201 });
+    return NextResponse.json(serializeBigInt(product), { status: 201 });
   } catch (error) {
     console.error("Create product error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
 
 // PUT /api/admin/products - Update product
 export async function PUT(req: NextRequest) {
@@ -94,8 +109,8 @@ export async function PUT(req: NextRequest) {
     if (data.brand !== undefined) updateData.brand = data.brand;
     if (data.department !== undefined) updateData.department = data.department;
     if (data.subcategory !== undefined) updateData.subcategory = data.subcategory;
-    if (data.price !== undefined) updateData.price = Number(data.price);
-    if (data.compareAtPrice !== undefined) updateData.compareAtPrice = data.compareAtPrice ? Number(data.compareAtPrice) : null;
+    if (data.price !== undefined) updateData.price = BigInt(Math.round(Number(data.price)));
+    if (data.compareAtPrice !== undefined) updateData.compareAtPrice = data.compareAtPrice ? BigInt(Math.round(Number(data.compareAtPrice))) : null;
     if (data.description !== undefined) updateData.description = data.description;
     if (data.sizes !== undefined) updateData.sizes = data.sizes;
     if (data.images !== undefined) updateData.images = data.images;
@@ -123,15 +138,16 @@ export async function PUT(req: NextRequest) {
 
     // If variants provided, replace them
     if (newVariants && Array.isArray(newVariants)) {
+      const validVariants = newVariants.filter((v: { label: string }) => v.label && v.label.trim());
       await prisma.productVariant.deleteMany({ where: { productId: Number(id) } });
-      for (let idx = 0; idx < newVariants.length; idx++) {
-        const v = newVariants[idx];
+      for (let idx = 0; idx < validVariants.length; idx++) {
+        const v = validVariants[idx];
         await prisma.productVariant.create({
           data: {
             productId: Number(id),
-            label: v.label || "Default",
+            label: v.label.trim(),
             colorCode: v.colorCode || "#000000",
-            sku: v.sku || (product.slug + "-v" + idx + "-" + Date.now()),
+            sku: v.sku?.trim() || (product.slug + "-v" + idx + "-" + Date.now()),
           },
         });
       }
@@ -142,7 +158,7 @@ export async function PUT(req: NextRequest) {
       include: { variants: true },
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(serializeBigInt(updated));
   } catch (error) {
     console.error("Update product error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
