@@ -6,13 +6,12 @@ import { FormEvent, useEffect, useState } from "react";
 import {
   BLOG_POSTS,
   CATEGORIES,
-  PRODUCTS,
   STORE,
   formatCurrency,
   getDepartment,
-  getProduct,
   type Product,
 } from "@/lib/store-data";
+import { useProducts, useProduct, useAllProducts } from "@/hooks/useProducts";
 
 type CartItem = { slug: string; variant: string; size: string; quantity: number };
 type StoredOrder = { id: string; status: string; total: number } | null;
@@ -280,15 +279,16 @@ function HomeBlock({ title, products }: { title: string; products: Product[] }) 
 
 export function HomePage() {
   const [active, setActive] = useState(0);
+  const { products: allProducts, loading } = useProducts();
 
   useEffect(() => {
     const id = window.setInterval(() => setActive((value) => (value + 1) % banners.length), 5000);
     return () => window.clearInterval(id);
   }, []);
 
-  const featured = PRODUCTS.filter((product) => product.featured).slice(0, 10);
-  const best = PRODUCTS.filter((product) => product.bestSeller).slice(0, 10);
-  const fresh = PRODUCTS.filter((product) => product.isNew).slice(0, 10);
+  const featured = allProducts.filter((product) => product.featured).slice(0, 10);
+  const best = allProducts.filter((product) => product.bestSeller).slice(0, 10);
+  const fresh = allProducts.filter((product) => product.isNew).slice(0, 10);
   const heroSlides = [
     {
       title: "Bộ sưu tập hè mới",
@@ -401,9 +401,15 @@ export function HomePage() {
           </div>
         </section>
 
-        <HomeBlock title="Sản phẩm nổi bật" products={featured} />
-        <HomeBlock title="Bán chạy tại cửa hàng" products={best} />
-        <HomeBlock title="Mới cập nhật" products={fresh} />
+        {loading ? (
+          <section className="container-shell text-center py-8 text-[#999]">Đang tải sản phẩm...</section>
+        ) : (
+          <>
+            <HomeBlock title="Sản phẩm nổi bật" products={featured} />
+            <HomeBlock title="Bán chạy tại cửa hàng" products={best} />
+            <HomeBlock title="Mới cập nhật" products={fresh} />
+          </>
+        )}
 
         <section className="container-shell grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
           <div>
@@ -461,13 +467,8 @@ export function ListingPage({
 }) {
   const [sort, setSort] = useState("featured");
   const departmentInfo = getDepartment(department || "");
-  const filtered = PRODUCTS.filter(
-    (product) =>
-      (!department || product.department === department) &&
-      (!subcategory || product.subcategory === subcategory) &&
-      (!search || [product.name, product.description, ...product.tags].join(" ").toLowerCase().includes(search.toLowerCase())),
-  );
-  const results = sortProducts(filtered, sort);
+  const { products: apiProducts, loading } = useProducts({ department, subcategory, search });
+  const results = sortProducts(apiProducts, sort);
 
   return (
     <Shell>
@@ -525,7 +526,7 @@ export function ListingPage({
             </div>
 
             <div className="mb-4 flex items-center justify-between border border-[#eee] p-3 text-sm">
-              <span>{results.length} sản phẩm</span>
+              <span>{loading ? "Đang tải..." : `${results.length} sản phẩm`}</span>
               <span>Catalog đã được mở rộng và có ảnh sản phẩm</span>
             </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-4">
@@ -545,13 +546,31 @@ export function ProductPage({ slug }: { slug: string }) {
 }
 
 function ProductDetail({ slug }: { slug: string }) {
-  const product = getProduct(slug);
+  const { product, loading: productLoading } = useProduct(slug);
+  const { products: allProducts } = useProducts();
   const { items, addItem } = useCart();
-  const [variant, setVariant] = useState(product?.colors[0]?.sku || "");
-  const [size, setSize] = useState(product?.sizes[0] || "");
+  const [variant, setVariant] = useState("");
+  const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
-  const [activeImage, setActiveImage] = useState(product?.images[0] || "");
+  const [activeImage, setActiveImage] = useState("");
   const [addedFeedback, setAddedFeedback] = useState(false);
+
+  // Init selections when product loads
+  useEffect(() => {
+    if (product) {
+      setVariant((v) => v || product.colors[0]?.sku || "");
+      setSize((s) => s || product.sizes[0] || "");
+      setActiveImage((img) => img || product.images[0] || "");
+    }
+  }, [product]);
+
+  if (productLoading) {
+    return (
+      <Shell>
+        <section className="container-shell py-16 text-center text-[#999]">Đang tải sản phẩm...</section>
+      </Shell>
+    );
+  }
 
   if (!product) {
     return (
@@ -561,7 +580,7 @@ function ProductDetail({ slug }: { slug: string }) {
     );
   }
 
-  const related = PRODUCTS.filter((item) => item.slug !== product.slug && item.department === product.department).slice(0, 5);
+  const related = allProducts.filter((item) => item.slug !== product.slug && item.department === product.department).slice(0, 5);
 
   return (
     <Shell>
@@ -673,8 +692,9 @@ function ProductDetail({ slug }: { slug: string }) {
 
 export function CartPage() {
   const { items, updateItem, removeItem } = useCart();
+  const { products: allProducts } = useAllProducts();
   const rows = items
-    .map((item) => ({ ...item, product: getProduct(item.slug) }))
+    .map((item) => ({ ...item, product: allProducts.find((p) => p.slug === item.slug) }))
     .filter((item): item is CartItem & { product: Product } => Boolean(item.product));
   const subtotal = rows.reduce((sum, row) => sum + row.product.price * row.quantity, 0);
   const shipping = rows.length ? (subtotal >= 300000 ? 0 : 30000) : 0;
@@ -750,8 +770,9 @@ export function CartPage() {
 export function CheckoutPage() {
   const { items, setItems } = useCart();
   const [error, setError] = useState("");
+  const { products: allProducts } = useAllProducts();
   const rows = items
-    .map((item) => ({ ...item, product: getProduct(item.slug) }))
+    .map((item) => ({ ...item, product: allProducts.find((p) => p.slug === item.slug) }))
     .filter((item): item is CartItem & { product: Product } => Boolean(item.product));
   const subtotal = rows.reduce((sum, row) => sum + row.product.price * row.quantity, 0);
   const shipping = rows.length ? (subtotal >= 300000 ? 0 : 30000) : 0;
