@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     const productMap = new Map(products.map((product) => [product.id, product]));
 
-    let total = 0n;
+    let total = BigInt(0);
     const orderItems = items.map((item) => {
       const product = productMap.get(item.productId);
       if (!product) {
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    if (total <= 0n) {
+    if (total <= BigInt(0)) {
       return NextResponse.json({ error: "Invalid order total" }, { status: 400 });
     }
 

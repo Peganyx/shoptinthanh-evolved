@@ -556,14 +556,9 @@ function ProductDetail({ slug }: { slug: string }) {
   const [activeImage, setActiveImage] = useState("");
   const [addedFeedback, setAddedFeedback] = useState(false);
 
-  // Init selections when product loads
-  useEffect(() => {
-    if (product) {
-      setVariant((v) => v || product.colors[0]?.sku || "");
-      setSize((s) => s || product.sizes[0] || "");
-      setActiveImage((img) => img || product.images[0] || "");
-    }
-  }, [product]);
+  const selectedVariant = variant || product?.colors[0]?.sku || "";
+  const selectedSize = size || product?.sizes[0] || "";
+  const selectedImage = activeImage || product?.images[0] || "";
 
   if (productLoading) {
     return (
@@ -589,7 +584,7 @@ function ProductDetail({ slug }: { slug: string }) {
         <div className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
           <div className="space-y-4">
             <div className="relative aspect-[4/5] border border-[#eee] bg-[#fafafa]">
-              <Image src={activeImage} alt={product.name} fill className="object-cover" />
+              <Image src={selectedImage} alt={product.name} fill className="object-cover" />
             </div>
             <div className="grid grid-cols-4 gap-3">
               {product.images.map((image) => (
@@ -597,7 +592,7 @@ function ProductDetail({ slug }: { slug: string }) {
                   key={image}
                   type="button"
                   onClick={() => setActiveImage(image)}
-                  className={`relative aspect-square overflow-hidden border ${activeImage === image ? "border-black" : "border-[#eee]"}`}
+                  className={`relative aspect-square overflow-hidden border ${selectedImage === image ? "border-black" : "border-[#eee]"}`}
                 >
                   <Image src={image} alt={product.name} fill className="object-cover" />
                 </button>
@@ -621,7 +616,7 @@ function ProductDetail({ slug }: { slug: string }) {
                   <button
                     key={color.sku}
                     onClick={() => setVariant(color.sku)}
-                    className={`rounded border px-3 py-2 text-sm ${variant === color.sku ? "border-black" : "border-[#ddd]"}`}
+                    className={`rounded border px-3 py-2 text-sm ${selectedVariant === color.sku ? "border-black" : "border-[#ddd]"}`}
                   >
                     {color.label} • {color.sku}
                   </button>
@@ -636,7 +631,7 @@ function ProductDetail({ slug }: { slug: string }) {
                   <button
                     key={item}
                     onClick={() => setSize(item)}
-                    className={`rounded border px-3 py-2 text-sm ${size === item ? "border-black bg-black text-white" : "border-[#ddd]"}`}
+                    className={`rounded border px-3 py-2 text-sm ${selectedSize === item ? "border-black bg-black text-white" : "border-[#ddd]"}`}
                   >
                     {item}
                   </button>
@@ -656,7 +651,7 @@ function ProductDetail({ slug }: { slug: string }) {
               </div>
               <button
                 onClick={() => (() => {
-                    addItem({ slug: product.slug, variant, size, quantity: qty });
+                    addItem({ slug: product.slug, variant: selectedVariant, size: selectedSize, quantity: qty });
                     setAddedFeedback(true);
                     setTimeout(() => setAddedFeedback(false), 1800);
                   })()}
