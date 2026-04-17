@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import { Be_Vietnam_Pro } from "next/font/google";
 import Script from "next/script";
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Shop Tín Thành - Thời trang chính hãng tại Cao Lãnh",
@@ -22,7 +29,6 @@ const inlineBaseStyles = `
     margin: 0;
     background: var(--background);
     color: var(--foreground);
-    font-family: 'Be Vietnam Pro', system-ui, sans-serif;
     text-rendering: optimizeLegibility;
   }
   a, button, select, input, textarea, summary {
@@ -51,15 +57,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="vi">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
         <style dangerouslySetInnerHTML={{ __html: inlineBaseStyles }} />
       </head>
-      <body>
+      <body className={beVietnamPro.className}>
         <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
         {children}
       </body>

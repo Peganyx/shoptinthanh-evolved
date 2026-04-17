@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyObj = Record<string, any>;
@@ -39,6 +40,7 @@ const statusFlow = ["pending", "confirmed", "shipped", "delivered"];
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const [secret, setSecret] = useState("");
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<"dashboard" | "orders" | "products">("dashboard");
@@ -49,61 +51,82 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<AnyObj | null>(null);
   const [orderFilter, setOrderFilter] = useState("all");
 
-  const getSecret = useCallback(() => {
-    return secret || (typeof window !== "undefined" ? localStorage.getItem("admin-secret") || "" : "");
-  }, [secret]);
-
   const fetchData = useCallback(async () => {
-    const s = getSecret();
-    const headers = { "x-admin-secret": s };
-
     const [ordersRes, productsRes, statsRes] = await Promise.all([
-      fetch("/api/orders", { headers }),
+      fetch("/api/orders"),
       fetch("/api/products"),
-      fetch("/api/admin/orders", { headers }),
+      fetch("/api/admin/orders"),
     ]);
+
+    if (ordersRes.status === 401 || statsRes.status === 401) {
+      setAuthed(false);
+      return;
+    }
 
     if (ordersRes.ok) setOrders(await ordersRes.json());
     if (productsRes.ok) setProducts(await productsRes.json());
     if (statsRes.ok) setStats(await statsRes.json());
-  }, [getSecret]);
+  }, []);
+
+  const bootstrapSession = useCallback(async () => {
+    try {
+      const sessionRes = await fetch("/api/admin/session");
+      if (!sessionRes.ok) {
+        setAuthed(false);
+        return;
+      }
+
+      const session = await sessionRes.json();
+      if (session?.authenticated) {
+        setAuthed(true);
+        await fetchData();
+      } else {
+        setAuthed(false);
+      }
+    } catch {
+      setAuthed(false);
+    } finally {
+      setCheckingSession(false);
+    }
+  }, [fetchData]);
 
   async function login() {
     setLoading(true);
-    const res = await fetch("/api/orders", { headers: { "x-admin-secret": secret } });
-    if (res.ok) {
-      localStorage.setItem("admin-secret", secret);
-      setAuthed(true);
-      fetchData();
-    } else {
-      alert("Sai mật khẩu admin");
+    try {
+      const res = await fetch("/api/admin/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret }),
+      });
+
+      if (res.ok) {
+        setAuthed(true);
+        setSecret("");
+        await fetchData();
+      } else {
+        alert("Sai mật khẩu admin");
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
+  }
+
+  async function logout() {
+    await fetch("/api/admin/session", { method: "DELETE" });
+    setAuthed(false);
+    setOrders([]);
+    setStats(null);
   }
 
   useEffect(() => {
-    const saved = localStorage.getItem("admin-secret");
-    if (saved) {
-      setSecret(saved);
-      fetch("/api/orders", { headers: { "x-admin-secret": saved } }).then((res) => {
-        if (res.ok) {
-          setAuthed(true);
-          setSecret(saved);
-        }
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (authed) fetchData();
-  }, [authed, fetchData]);
+    void bootstrapSession();
+  }, [bootstrapSession]);
 
   // ===== Order Status Update =====
   async function updateOrderStatus(orderId: number, status: string) {
-    const s = getSecret();
     const res = await fetch("/api/admin/orders", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", "x-admin-secret": s },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: orderId, status }),
     });
     if (res.ok) {
@@ -113,11 +136,10 @@ export default function AdminPage() {
 
   // ===== Product CRUD =====
   async function saveProduct(formData: AnyObj) {
-    const s = getSecret();
     const method = formData.id ? "PUT" : "POST";
     const res = await fetch("/api/admin/products", {
       method,
-      headers: { "Content-Type": "application/json", "x-admin-secret": s },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
     if (res.ok) {
@@ -132,10 +154,8 @@ export default function AdminPage() {
 
   async function deleteProduct(id: number, name: string) {
     if (!confirm(`Xóa sản phẩm "${name}"?`)) return;
-    const s = getSecret();
     const res = await fetch(`/api/admin/products?id=${id}`, {
       method: "DELETE",
-      headers: { "x-admin-secret": s },
     });
     if (res.ok) {
       setProducts((prev) => prev.filter((p) => p.id !== id));
@@ -143,12 +163,10 @@ export default function AdminPage() {
   }
 
   async function uploadImage(file: File): Promise<string | null> {
-    const s = getSecret();
     const form = new FormData();
     form.append("file", file);
     const res = await fetch("/api/admin/upload", {
       method: "POST",
-      headers: { "x-admin-secret": s },
       body: form,
     });
     if (res.ok) {
@@ -159,6 +177,14 @@ export default function AdminPage() {
   }
 
   // ===== Login Screen =====
+  if (checkingSession) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <p className="text-sm text-gray-500">Đang kiểm tra phiên đăng nhập...</p>
+      </div>
+    );
+  }
+
   if (!authed) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
@@ -215,7 +241,7 @@ export default function AdminPage() {
               ← Shop
             </Link>
             <button
-              onClick={() => { localStorage.removeItem("admin-secret"); setAuthed(false); }}
+              onClick={logout}
               className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-500 hover:bg-red-50"
             >
               Đăng xuất
@@ -373,7 +399,7 @@ export default function AdminPage() {
                     <tr key={p.id} className="border-t hover:bg-gray-50">
                       <td className="px-4 py-3">
                         {p.images?.[0] && (
-                          <img src={p.images[0]} alt={p.name} className="h-12 w-12 rounded-lg object-cover" />
+                          <Image src={p.images[0]} alt={p.name} width={48} height={48} className="h-12 w-12 rounded-lg object-cover" unoptimized />
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -607,7 +633,7 @@ function ProductForm({
         <div className="flex flex-wrap gap-3">
           {form.images.map((url: string, i: number) => (
             <div key={i} className="group relative h-20 w-20 overflow-hidden rounded-lg border">
-              <img src={url} alt="" className="h-full w-full object-cover" />
+              <Image src={url} alt={`Ảnh sản phẩm ${i + 1}`} width={80} height={80} className="h-full w-full object-cover" unoptimized />
               <button
                 type="button"
                 onClick={() => removeImage(i)}

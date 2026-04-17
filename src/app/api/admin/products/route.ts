@@ -1,82 +1,147 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { serializeBigInt } from "@/lib/serialize";
 
-function checkAuth(req: NextRequest) {
-  const secret = req.headers.get("x-admin-secret");
-  if (!secret || secret !== process.env.ADMIN_SECRET) {
-    return false;
-  }
-  return true;
+function slugify(value: string) {
+  const slug = value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return slug || "product";
 }
 
+async function makeUniqueSlug(baseSlug: string, excludeId?: number) {
+  let candidate = baseSlug;
+  let index = 2;
 
+  while (true) {
+    const exists = await prisma.product.findFirst({
+      where: {
+        slug: candidate,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+      select: { id: true },
+    });
+
+    if (!exists) {
+      return candidate;
+    }
+
+    candidate = `${baseSlug}-${index}`;
+    index += 1;
+  }
+}
+
+function text(value: unknown, fallback = "") {
+  return typeof value === "string" ? value.trim() : fallback;
+}
+
+function bool(value: unknown, fallback = false) {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function stringArray(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [] as string[];
+  }
+
+  return value
+    .map((item) => (typeof item === "string" ? item.trim() : ""))
+    .filter(Boolean);
+}
+
+function toPositiveBigInt(value: unknown) {
+  const numberValue = Number(value);
+  if (!Number.isFinite(numberValue) || numberValue <= 0) {
+    return null;
+  }
+  return BigInt(Math.round(numberValue));
+}
+
+function isEmpty(value: unknown) {
+  return value === undefined || value === null || (typeof value === "string" && value.trim() === "");
+}
+
+function buildVariants(rawVariants: unknown, slug: string) {
+  const variants = Array.isArray(rawVariants) ? rawVariants : [];
+  const seen = new Set<string>();
+
+  return variants
+    .map((raw, idx) => {
+      const variant = (raw || {}) as Record<string, unknown>;
+      const label = text(variant.label, "Default") || "Default";
+      const colorCode = /^#[0-9a-fA-F]{6}$/.test(text(variant.colorCode)) ? text(variant.colorCode) : "#000000";
+      let sku = text(variant.sku, "");
+
+      if (!sku || seen.has(sku)) {
+        sku = `${slug}-v${idx + 1}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      }
+
+      seen.add(sku);
+      return { label, colorCode, sku };
+    })
+    .filter((variant) => Boolean(variant.sku));
+}
 
 // POST /api/admin/products - Create product
 export async function POST(req: NextRequest) {
-  if (!checkAuth(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   try {
-    const body = await req.json();
-    const {
-      name, brand, department, subcategory, price, compareAtPrice,
-      description, sizes, images, featured, bestSeller, isNew, tags, variants,
-    } = body;
+    const body = (await req.json()) as Record<string, unknown>;
 
-    if (!name || !brand || !price) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const name = text(body.name);
+    const brand = text(body.brand);
+    const price = toPositiveBigInt(body.price);
+
+    if (!name || !brand || price === null) {
+      return NextResponse.json({ error: "Missing or invalid required fields" }, { status: 400 });
     }
 
-    // Validate price is a valid number
-    const priceNum = Number(price);
-    if (!Number.isFinite(priceNum) || priceNum <= 0) {
-      return NextResponse.json({ error: "Giá phải là số dương hợp lệ" }, { status: 400 });
+    let compareAtPrice: bigint | null = null;
+    if (!isEmpty(body.compareAtPrice)) {
+      compareAtPrice = toPositiveBigInt(body.compareAtPrice);
+      if (compareAtPrice === null) {
+        return NextResponse.json({ error: "Invalid compareAtPrice" }, { status: 400 });
+      }
     }
 
-    // Generate slug from name
-    const slug = name
-      .toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/đ/g, "d").replace(/Đ/g, "D")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
-
-    // Check slug collision
-    const existing = await prisma.product.findUnique({ where: { slug } });
-    const finalSlug = existing ? slug + "-" + Date.now() : slug;
-
-    // Filter out empty variants
-    const validVariants = (variants || [])
-      .filter((v: { label: string }) => v.label && v.label.trim())
-      .map((v: { label: string; colorCode: string; sku: string }, i: number) => ({
-        label: v.label.trim(),
-        colorCode: v.colorCode || "#000000",
-        sku: v.sku?.trim() || (finalSlug + "-v" + (i + 1) + "-" + Date.now()),
-      }));
+    const baseSlug = slugify(name);
+    const finalSlug = await makeUniqueSlug(baseSlug);
+    const variants = buildVariants(body.variants, finalSlug);
 
     const product = await prisma.product.create({
       data: {
         slug: finalSlug,
         name,
         brand,
-        department: department || "nam",
-        subcategory: subcategory || "giay",
-        price: BigInt(Math.round(priceNum)),
-        compareAtPrice: compareAtPrice ? BigInt(Math.round(Number(compareAtPrice))) : null,
-        description: description || "",
-        sizes: sizes || [],
-        images: images || [],
-        featured: featured || false,
-        bestSeller: bestSeller || false,
-        isNew: isNew || false,
-        tags: tags || [],
-        variants: validVariants.length > 0 ? {
-          create: validVariants,
-        } : undefined,
+        department: text(body.department, "nam") || "nam",
+        subcategory: text(body.subcategory, "giay") || "giay",
+        price,
+        compareAtPrice,
+        description: text(body.description),
+        sizes: stringArray(body.sizes),
+        images: stringArray(body.images),
+        featured: bool(body.featured),
+        bestSeller: bool(body.bestSeller),
+        isNew: bool(body.isNew),
+        tags: stringArray(body.tags),
+        variants: variants.length
+          ? {
+              create: variants,
+            }
+          : undefined,
       },
       include: { variants: true },
     });
@@ -88,74 +153,100 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
 // PUT /api/admin/products - Update product
 export async function PUT(req: NextRequest) {
-  if (!checkAuth(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   try {
-    const body = await req.json();
-    const { id, variants: newVariants, ...data } = body;
+    const body = (await req.json()) as Record<string, unknown>;
+    const id = Number(body.id);
+    const newVariants = body.variants;
 
-    if (!id) {
+    if (!Number.isInteger(id) || id <= 0) {
       return NextResponse.json({ error: "Product ID required" }, { status: 400 });
     }
 
-    // Update product fields
-    const updateData: Record<string, unknown> = {};
-    if (data.name !== undefined) updateData.name = data.name;
-    if (data.brand !== undefined) updateData.brand = data.brand;
-    if (data.department !== undefined) updateData.department = data.department;
-    if (data.subcategory !== undefined) updateData.subcategory = data.subcategory;
-    if (data.price !== undefined) updateData.price = BigInt(Math.round(Number(data.price)));
-    if (data.compareAtPrice !== undefined) updateData.compareAtPrice = data.compareAtPrice ? BigInt(Math.round(Number(data.compareAtPrice))) : null;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.sizes !== undefined) updateData.sizes = data.sizes;
-    if (data.images !== undefined) updateData.images = data.images;
-    if (data.featured !== undefined) updateData.featured = data.featured;
-    if (data.bestSeller !== undefined) updateData.bestSeller = data.bestSeller;
-    if (data.isNew !== undefined) updateData.isNew = data.isNew;
-    if (data.tags !== undefined) updateData.tags = data.tags;
-    if (data.inStock !== undefined) updateData.inStock = data.inStock;
-
-    // Re-generate slug if name changed
-    if (data.name) {
-      updateData.slug = data.name
-        .toLowerCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d").replace(/Đ/g, "D")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
-    }
-
-    const product = await prisma.product.update({
-      where: { id: Number(id) },
-      data: updateData,
-      include: { variants: true },
+    const existing = await prisma.product.findUnique({
+      where: { id },
+      select: { id: true },
     });
 
-    // If variants provided, replace them
-    if (newVariants && Array.isArray(newVariants)) {
-      const validVariants = newVariants.filter((v: { label: string }) => v.label && v.label.trim());
-      await prisma.productVariant.deleteMany({ where: { productId: Number(id) } });
-      for (let idx = 0; idx < validVariants.length; idx++) {
-        const v = validVariants[idx];
-        await prisma.productVariant.create({
-          data: {
-            productId: Number(id),
-            label: v.label.trim(),
-            colorCode: v.colorCode || "#000000",
-            sku: v.sku?.trim() || (product.slug + "-v" + idx + "-" + Date.now()),
-          },
-        });
+    if (!existing) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    const updateData: Record<string, unknown> = {};
+
+    if (body.name !== undefined) {
+      const name = text(body.name);
+      if (!name) {
+        return NextResponse.json({ error: "Invalid product name" }, { status: 400 });
+      }
+      updateData.name = name;
+      updateData.slug = await makeUniqueSlug(slugify(name), id);
+    }
+
+    if (body.brand !== undefined) updateData.brand = text(body.brand);
+    if (body.department !== undefined) updateData.department = text(body.department, "nam") || "nam";
+    if (body.subcategory !== undefined) updateData.subcategory = text(body.subcategory, "giay") || "giay";
+
+    if (body.price !== undefined) {
+      const price = toPositiveBigInt(body.price);
+      if (price === null) {
+        return NextResponse.json({ error: "Invalid price" }, { status: 400 });
+      }
+      updateData.price = price;
+    }
+
+    if (body.compareAtPrice !== undefined) {
+      if (isEmpty(body.compareAtPrice)) {
+        updateData.compareAtPrice = null;
+      } else {
+        const compareAtPrice = toPositiveBigInt(body.compareAtPrice);
+        if (compareAtPrice === null) {
+          return NextResponse.json({ error: "Invalid compareAtPrice" }, { status: 400 });
+        }
+        updateData.compareAtPrice = compareAtPrice;
       }
     }
 
-    const updated = await prisma.product.findUnique({
-      where: { id: Number(id) },
-      include: { variants: true },
+    if (body.description !== undefined) updateData.description = text(body.description);
+    if (body.sizes !== undefined) updateData.sizes = stringArray(body.sizes);
+    if (body.images !== undefined) updateData.images = stringArray(body.images);
+    if (body.featured !== undefined) updateData.featured = bool(body.featured);
+    if (body.bestSeller !== undefined) updateData.bestSeller = bool(body.bestSeller);
+    if (body.isNew !== undefined) updateData.isNew = bool(body.isNew);
+    if (body.tags !== undefined) updateData.tags = stringArray(body.tags);
+    if (body.inStock !== undefined) updateData.inStock = bool(body.inStock, true);
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const product = await tx.product.update({
+        where: { id },
+        data: updateData,
+        include: { variants: true },
+      });
+
+      if (Array.isArray(newVariants)) {
+        await tx.productVariant.deleteMany({ where: { productId: id } });
+
+        const variantData = buildVariants(newVariants, product.slug);
+        if (variantData.length > 0) {
+          await tx.productVariant.createMany({
+            data: variantData.map((variant) => ({
+              productId: id,
+              ...variant,
+            })),
+          });
+        }
+      }
+
+      return tx.product.findUnique({
+        where: { id },
+        include: { variants: true },
+      });
     });
 
     return NextResponse.json(serializeBigInt(updated));
@@ -167,19 +258,20 @@ export async function PUT(req: NextRequest) {
 
 // DELETE /api/admin/products - Delete product
 export async function DELETE(req: NextRequest) {
-  if (!checkAuth(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   try {
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const id = Number(searchParams.get("id"));
 
-    if (!id) {
+    if (!Number.isInteger(id) || id <= 0) {
       return NextResponse.json({ error: "Product ID required" }, { status: 400 });
     }
 
-    await prisma.product.delete({ where: { id: Number(id) } });
+    await prisma.product.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete product error:", error);

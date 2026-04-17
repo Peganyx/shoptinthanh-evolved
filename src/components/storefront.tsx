@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import {
   BLOG_POSTS,
@@ -768,6 +769,7 @@ export function CartPage() {
 }
 
 export function CheckoutPage() {
+  const router = useRouter();
   const { items, setItems } = useCart();
   const [error, setError] = useState("");
   const { products: allProducts } = useAllProducts();
@@ -827,7 +829,7 @@ export function CheckoutPage() {
 
       localStorage.setItem("last-order", JSON.stringify({ id: data.orderId, total: data.total, status: "pending" }));
       setItems([]);
-      window.location.href = "/dat-hang-thanh-cong";
+      router.push("/dat-hang-thanh-cong");
     } catch {
       setError("Lỗi kết nối. Vui lòng thử lại.");
       setSubmitting(false);

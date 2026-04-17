@@ -1,21 +1,15 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/db";
 import { serializeBigInt } from "@/lib/serialize";
 
-function checkAuth(req: NextRequest) {
-  const secret = req.headers.get("x-admin-secret");
-  if (!secret || secret !== process.env.ADMIN_SECRET) {
-    return false;
-  }
-  return true;
-}
-
 // PATCH /api/admin/orders - Update order status
 export async function PATCH(req: NextRequest) {
-  if (!checkAuth(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   try {
@@ -45,8 +39,9 @@ export async function PATCH(req: NextRequest) {
 
 // GET /api/admin/orders - Dashboard stats
 export async function GET(req: NextRequest) {
-  if (!checkAuth(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const unauthorized = requireAdmin(req);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   try {
@@ -68,17 +63,10 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "asc" },
     });
 
-    const todayRevenue = todayOrders
-      .filter(o => o.status !== "cancelled")
-      .reduce((sum: number, o) => sum + Number(o.total), 0);
-    const weekRevenue = weekOrders
-      .filter(o => o.status !== "cancelled")
-      .reduce((sum: number, o) => sum + Number(o.total), 0);
-    const monthRevenue = monthOrders
-      .filter(o => o.status !== "cancelled")
-      .reduce((sum: number, o) => sum + Number(o.total), 0);
+    const todayRevenue = todayOrders.filter((o) => o.status !== "cancelled").reduce((sum: number, o) => sum + Number(o.total), 0);
+    const weekRevenue = weekOrders.filter((o) => o.status !== "cancelled").reduce((sum: number, o) => sum + Number(o.total), 0);
+    const monthRevenue = monthOrders.filter((o) => o.status !== "cancelled").reduce((sum: number, o) => sum + Number(o.total), 0);
 
-    // Group orders by day for chart
     const dailyData: Record<string, { orders: number; revenue: number }> = {};
     for (let i = 6; i >= 0; i--) {
       const d = new Date(todayStart);
@@ -86,6 +74,7 @@ export async function GET(req: NextRequest) {
       const key = d.toISOString().split("T")[0];
       dailyData[key] = { orders: 0, revenue: 0 };
     }
+
     for (const order of allOrders) {
       const key = order.createdAt.toISOString().split("T")[0];
       if (dailyData[key]) {
